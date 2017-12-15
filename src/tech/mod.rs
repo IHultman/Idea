@@ -1,6 +1,6 @@
 use std::boxed::Box;
 use std::ops::{Index, IndexMut};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, Weak};
 
 
 type Ptr<T> = Arc<Mutex<T> >;
@@ -40,9 +40,26 @@ pub struct CrystalProperties {
 
 impl CrystalProperties {
   fn new() -> Self {
-    properties: [[false; 5]; 12],
+    CrystalProperties {
+      properties: [[false; 5]; 12],
+    }
   }
 }
+
+
+pub struct TechState {
+  properties: CrystalProperties,
+}
+
+impl TechState {
+  pub fn new() -> Self {
+    TechState {
+      properties: CrystalProperties::new(),
+      tech_graph: TechDiGraph::new(),
+    }
+  }
+}
+
 
 impl Index<CrystalProperty> for CrystalProperties {
   type Output = [bool; 5];
@@ -89,11 +106,19 @@ pub struct TechDiGraph {
   base: Vec<TechNode>,
 }
 
+impl TechDiGraph {
+  pub fn new() -> Self {
+    TechDiGraph {
+      base: Vec::new(),
+    }
+  }
+}
+
 pub struct TechNode {
   tech_name: Tech,
   available: bool,
-  acquired_in_edges: Option<Vec<Arc<TechNode>> >,
-  unacquired_in_edges: Option<Vec<Arc<TechNode>> >,
+  acquired_in_edges: Option<Vec<Weak<TechNode>> >,
+  unacquired_in_edges: Option<Vec<Weak<TechNode>> >,
   out_edges: Option<Vec<Arc<TechNode>> >,
 }
 
@@ -104,6 +129,16 @@ impl TechNode {
     acquired_in_edges: None,
     unacquired_in_edges: None,
     out_edges: None,
+  }
+
+  fn add_in(&mut self, tech: Weak<TechNode>) {
+    let vec: &mut Vec<Weak<TechNode> > = self.unacquired_in_edges.get_or_insert(Vec::new() );
+    vec.push(tech);
+  }
+
+  fn add_out(&mut self, tech: Arc<TechNode>) {
+    let vec: &mut Vec<Arc<TechNode> > = self.out_edges.get_or_insert(Vec::new() );
+    vec.push(tech);
   }
 }
 
