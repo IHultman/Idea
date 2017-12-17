@@ -1,11 +1,11 @@
 use std::boxed::Box;
+use std::iter::IntoIterator;
 use std::ops::{Index, IndexMut};
+use std::slice::IterMut;
 use std::sync::{Arc, Mutex, Weak};
 
 
 type Ptr<T> = Arc<Mutex<T> >;
-
-const TECH_STAGE_COST: [u64; 10] = [0, 200, 450, 900, 2000, 4000, 9000, 20000, 50000, 100000];
 
 
 enum CrystalProperty {
@@ -26,6 +26,7 @@ enum CrystalProperty {
 enum Tech {
   Antimatter,
   Earthquake,
+  EnergyShield,
   Flight,
   Teleport,
   Walls,
@@ -45,21 +46,6 @@ impl CrystalProperties {
     }
   }
 }
-
-
-pub struct TechState {
-  properties: CrystalProperties,
-}
-
-impl TechState {
-  pub fn new() -> Self {
-    TechState {
-      properties: CrystalProperties::new(),
-      tech_graph: TechDiGraph::new(),
-    }
-  }
-}
-
 
 impl Index<CrystalProperty> for CrystalProperties {
   type Output = [bool; 5];
@@ -114,9 +100,21 @@ impl TechDiGraph {
   }
 }
 
+impl<'a> IntoIterator for  &'a mut TechDiGraph {
+  type Item = &'a mut Arc<TechNode>;
+  type IntoIter = IterMut<'a, Arc<TechNode> >;
+
+  fn into_iter(self) -> Self::IntoIter {
+    for tech in &mut self.base {
+
+    }
+  }
+}
+
+
 pub struct TechNode {
   tech_name: Tech,
-  available: bool,
+  researched: bool,
   acquired_in_edges: Option<Vec<Weak<TechNode>> >,
   unacquired_in_edges: Option<Vec<Weak<TechNode>> >,
   out_edges: Option<Vec<Arc<TechNode>> >,
@@ -124,49 +122,37 @@ pub struct TechNode {
 
 impl TechNode {
   new(name: Tech) -> Self {
-    tech_name: name,
-    available: false,
-    acquired_in_edges: None,
-    unacquired_in_edges: None,
-    out_edges: None,
+    TechNode {
+      tech_name: name,
+      researched: false,
+      acquired_in_edges: None,
+      unacquired_in_edges: None,
+      out_edges: None,
+    }
   }
 
-  fn add_in(&mut self, tech: Weak<TechNode>) {
+  fn add_in_edge(&mut self, tech: Weak<TechNode>) {
     let vec: &mut Vec<Weak<TechNode> > = self.unacquired_in_edges.get_or_insert(Vec::new() );
     vec.push(tech);
   }
 
-  fn add_out(&mut self, tech: Arc<TechNode>) {
+  fn add_out_edge(&mut self, tech: Arc<TechNode>) {
     let vec: &mut Vec<Arc<TechNode> > = self.out_edges.get_or_insert(Vec::new() );
     vec.push(tech);
   }
 }
 
 
-#[derive(Debug, Clone, Copy)]
-pub struct tech_progress {
-  level: u8,
-  crystals_used: u64,
+pub struct TechState {
+  properties: CrystalProperties,
+  tech_graph: TechDiGraph,
 }
 
-impl tech_progress {
+impl TechState {
   pub fn new() -> Self {
-    tech_progress {
-      level: 1,
-      crystals_used: 0,
-    }
-  }
-
-  pub fn get_lvl(&self) -> u8 {
-    self.level
-  }
-
-  pub fn use_crystals(&mut self, crystals: u64) {
-    if self.level < 10 {
-      self.crystals_used += crystals;
-      if self.crystals_used > TECH_STAGE_COST[self.level as usize] {
-        self.level += 1;
-      }
+    TechState {
+      properties: CrystalProperties::new(),
+      tech_graph: TechDiGraph::new(),
     }
   }
 }
