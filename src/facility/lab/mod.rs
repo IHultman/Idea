@@ -10,48 +10,10 @@ use worker::Worker;
 
 type Ptr<T> = Arc<Mutex<T> >;
 
-const TECH_STAGE_COST: [u64; 10] = [0, 200, 450, 900, 2000, 4000, 9000, 20000, 50000, 100000];
-
-
-pub struct CrystalProperties {
-  properties: [Option<PropertyLevel>; 12]
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct tech_progress {
-  level: u8,
-  crystals_used: u64,
-}
-
-impl tech_progress {
-  pub fn new() -> Self {
-    tech_progress {
-      level: 1,
-      crystals_used: 0,
-    }
-  }
-
-  pub fn get_lvl(&self) -> u8 {
-    self.level
-  }
-
-  pub fn use_crystals(&mut self, crystals: u64) {
-    if self.level < 10 {
-      self.crystals_used += crystals;
-      if self.crystals_used > TECH_STAGE_COST[self.level as usize] {
-        self.level += 1;
-      }
-    }
-  }
-}
-
 #[derive(Debug)]
 pub struct Lab {
   crew: HashMap<u8, Ptr<Worker> >,
   crystals: CrystalBatch,
-  progress_list: [tech_progress; 7],
-  searching_property: Option<Color>,
-  studying_tech: Option<>,
 }
 
 impl Lab {
@@ -59,16 +21,13 @@ impl Lab {
     Lab {
       crew: HashMap::new(),
       crystals: CrystalBatch::new_base(),
-      progress_list: [tech_progress::new(); 7],
-      searching_property: None,
-      studying_tech: None,
     }
   }
 
   pub fn add_crystals(&mut self, crystals: CrystalBatch) {
     self.crystals = self.crystals + crystals;
   }
-
+/*
   pub fn set_study_color(&mut self, crystal: Color) {
     self.studying = Some(crystal);
   }
@@ -120,7 +79,9 @@ impl Lab {
       },
     }
   }
+*/
 }
+
 
 impl Facility for Lab {
   fn borrow_crew_hash(&self) -> &HashMap<u8, Ptr<Worker> > {

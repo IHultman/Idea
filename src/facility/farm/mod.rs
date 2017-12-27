@@ -39,5 +39,5 @@ impl Facility for Farm {
 }
 
 impl Producer for Farm {
-  type Resource = resource::Food;
+  type Resource = Food;
 }

@@ -4,6 +4,7 @@ use self::rand::Rng;
 
 pub mod facility;
 pub mod resources;
+pub mod tech;
 pub mod worker;
 pub mod worksite;
 

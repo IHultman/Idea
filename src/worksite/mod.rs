@@ -53,8 +53,8 @@ impl WorkSite {
   pub fn end_turn(&mut self) {
     self.accumulate_resources();
     self.exp_up();
-    WorkSite::pay_upkeep(&mut self.food, &crew);
-    WorkSite::pay_upkeep(&mut self.water, &crew);
+    WorkSite::pay_upkeep(&mut self.food, &self.crew);
+    WorkSite::pay_upkeep(&mut self.water, &self.crew);
   }
 
   pub fn move_unit(&mut self, id: u8, to_loc: Loc) {
@@ -96,7 +96,7 @@ impl WorkSite {
   fn exp_up(&mut self) {
     let mut handles = Vec::new();
 
-    handles.push(Self::spawn_thd_for_exp(self.academy.clone(), self.farm.clone() ) );
+    handles.push(Self::spawn_thd_for_exp(self.academy.clone(), self.farm.clone()) );
     handles.push(Self::spawn_thd_for_exp(self.lab.clone(), self.mine.clone()) );
     handles.push(Self::spawn_thd_for_exp(self.ship.clone(), self.water_proc.clone()) );
 
@@ -117,7 +117,7 @@ impl WorkSite {
     })
   }
 
-  fn accumulate_resources(&mut self) {
+  pub fn accumulate_resources(&mut self) {
     let food_handle = Self::spawn_thd_for_res(self.farm.clone() );
     let crystal_handle = Self::spawn_thd_for_res(self.mine.clone() );
     let water_handle = Self::spawn_thd_for_res(self.water_proc.clone() );

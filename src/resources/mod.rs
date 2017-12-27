@@ -24,6 +24,7 @@ pub trait ResourceUpkeep where
   Self: ResourceAccum +
         Sub<Self, Output=Self> +
         Mul<u64, Output=Self> +
+        Copy +
         Ord
 {
   fn get_value(&self) -> u64;

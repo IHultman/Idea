@@ -4,6 +4,8 @@ use std::sync::{Arc, Mutex};
 
 use facility::Loc;
 
+use resources::{ResourceAccum, ResourceUpkeep};
+
 use worker::Worker;
 
 

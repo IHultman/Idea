@@ -39,5 +39,5 @@ impl Facility for WaterProcessor {
 }
 
 impl Producer for WaterProcessor {
-  type Resource = resource::Water;
+  type Resource = Water;
 }

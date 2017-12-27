@@ -1,7 +1,6 @@
 extern crate game;
 
 use game::facility::*;
-use game::facility::mine::resource::*;
 use game::worker::Worker;
 use game::worksite::WorkSite;
 

@@ -39,5 +39,5 @@ impl Facility for Mine {
 }
 
 impl Producer for Mine {
-  type Resource = resource::CrystalBatch;
+  type Resource = CrystalBatch;
 }
