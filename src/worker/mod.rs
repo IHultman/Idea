@@ -3,8 +3,8 @@ use facility::Loc;
 const LEVELS: [u32; 10] = [0, 50, 100, 200, 350, 500, 750, 1000, 1500, 2000];
 
 
-#[derive(Debug, Clone, Copy)]
-pub struct Skill {
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Skill {
   level: u8,
   exp: u32,
 }
@@ -21,10 +21,10 @@ impl Skill {
     self.level
   }
 
-  fn add_exp(&mut self, exp: u32) {
+  fn add_exp(&mut self, exp: u16) {
     if self.level < 10 {
-      self.exp += exp;
-      if self.exp > LEVELS[self.level as usize] {
+      self.exp += exp as u32;
+      while (self.level < 10) && (self.exp >= LEVELS[self.level as usize]) {
         self.level += 1;
       }
     }
@@ -86,7 +86,7 @@ impl Worker {
     self.energy = if new_energy_level < 0.10 {0.10} else {new_energy_level};
   }
 
-  pub fn add_exp(&mut self, exp: u32) {
+  pub fn add_exp(&mut self, exp: u16) {
     match self.loc.expect("Cannot add experience without location") {
       Loc::Academy        => self.skills[0].add_exp(exp),
       Loc::Farm           => self.skills[1].add_exp(exp),
@@ -95,5 +95,26 @@ impl Worker {
       Loc::Ship           => self.skills[4].add_exp(exp),
       Loc::WaterProcessor => self.skills[5].add_exp(exp),
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn skill_struct_test() {
+    let mut skill = super::Skill::new();
+
+    assert_eq!(skill.get_lvl(), 1);
+    skill.add_exp(50);
+    assert_eq!(skill.get_lvl(), 2);
+    skill.add_exp(450);
+    assert_eq!(skill.get_lvl(), 6);
+    skill.add_exp(40000);
+    assert_eq!(skill.get_lvl(), 10);
+  }
+
+  #[test]
+  fn worker_struct_test() {
+
   }
 }

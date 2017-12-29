@@ -18,7 +18,7 @@ pub mod ship;
 pub mod waterproc;
 
 
-const EXP: u32 = 25;
+const EXP: u16 = 25;
 
 type Ptr<T> = Arc<Mutex<T> >;
 
