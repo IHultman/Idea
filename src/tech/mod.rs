@@ -295,5 +295,7 @@ impl TechState {
 #[cfg(test)]
 mod tests {
   #[test]
-  fn some_test() {}
+  fn tech_test() {
+
+  }
 }

@@ -41,3 +41,11 @@ impl Facility for WaterProcessor {
 impl Producer for WaterProcessor {
   type Resource = Water;
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn waterproc_test() {
+      
+  }
+}

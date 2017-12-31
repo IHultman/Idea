@@ -35,3 +35,11 @@ impl Facility for Ship {
     Loc::Ship
   }
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn ship_test() {
+      
+  }
+}

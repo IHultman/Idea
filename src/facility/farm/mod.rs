@@ -41,3 +41,11 @@ impl Facility for Farm {
 impl Producer for Farm {
   type Resource = Food;
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn farm_test() {
+      
+  }
+}

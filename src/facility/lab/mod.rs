@@ -96,3 +96,11 @@ impl Facility for Lab {
     Loc::Lab
   }
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn lab_test() {
+      
+  }
+}

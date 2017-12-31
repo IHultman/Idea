@@ -41,3 +41,11 @@ impl Facility for Mine {
 impl Producer for Mine {
   type Resource = CrystalBatch;
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn mine_test() {
+      
+  }
+}

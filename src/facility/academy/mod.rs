@@ -35,3 +35,11 @@ impl Facility for Academy {
     Loc::Academy
   }
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn academy_test() {
+
+  }
+}
