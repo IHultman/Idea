@@ -44,8 +44,32 @@ impl Producer for WaterProcessor {
 
 #[cfg(test)]
 mod tests {
+  use std::collections::HashMap;
+  use std::sync::{Arc, Mutex};
+  use facility::{Facility, Loc, Producer};
+  use resources::water::Water;
+  use super::*;
+  use worker::*;
+  //type Ptr<T> = Arc<Mutex<T> >;
+
   #[test]
-  fn waterproc_test() {
+  fn waterproc_test_1() {
+    let mut waterproc = WaterProcessor::new();
+
+    for i in 0..10 {
+      waterproc.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
+    }
+
+    assert_eq!(waterproc.borrow_crew_hash()
+                        .values()
+                        .fold(0, |count, worker| {
+                          assert_eq!(worker.lock().unwrap().get_loc(), Some(Loc::WaterProcessor) );
+                          count + 1
+                        }), 10);
+  }
+
+  #[test]
+  fn waterproc_test_2() {
       
   }
 }

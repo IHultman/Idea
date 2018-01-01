@@ -38,8 +38,31 @@ impl Facility for Academy {
 
 #[cfg(test)]
 mod tests {
+  use std::collections::HashMap;
+  use std::sync::{Arc, Mutex};
+  use facility::{Facility, Loc};
+  use super::*;
+  use worker::*;
+  //type Ptr<T> = Arc<Mutex<T> >;
+
   #[test]
-  fn academy_test() {
+  fn academy_test_1() {
+    let mut academy = Academy::new();
+
+    for i in 0..10 {
+      academy.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
+    }
+
+    assert_eq!(academy.borrow_crew_hash()
+                      .values()
+                      .fold(0, |count, worker| {
+                        assert_eq!(worker.lock().unwrap().get_loc(), Some(Loc::Academy) );
+                        count + 1
+                      }), 10);
+  }
+
+  #[test]
+  fn academy_test_2() {
 
   }
 }

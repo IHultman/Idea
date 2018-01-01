@@ -44,8 +44,32 @@ impl Producer for Farm {
 
 #[cfg(test)]
 mod tests {
+  use std::collections::HashMap;
+  use std::sync::{Arc, Mutex};
+  use facility::{Facility, Loc, Producer};
+  use resources::food::Food;
+  use super::*;
+  use worker::*;
+  //type Ptr<T> = Arc<Mutex<T> >;
+
   #[test]
-  fn farm_test() {
-      
+  fn farm_test_1() {
+    let mut farm = Farm::new();
+
+    for i in 0..10 {
+      farm.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
+    }
+
+    assert_eq!(farm.borrow_crew_hash()
+                   .values()
+                   .fold(0, |count, worker| {
+                     assert_eq!(worker.lock().unwrap().get_loc(), Some(Loc::Farm) );
+                     count + 1
+                   }), 10);
+  }
+
+  #[test]
+  fn farm_test_2() {
+
   }
 }
