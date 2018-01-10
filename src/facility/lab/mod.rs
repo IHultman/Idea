@@ -98,33 +98,4 @@ impl Facility for Lab {
 }
 
 #[cfg(test)]
-mod tests {
-  use std::collections::HashMap;
-  use std::sync::{Arc, Mutex};
-  use facility::{Facility, Loc, ResourceAccum};
-  use resources::crystals::{Color, CrystalBatch};
-  use super::*;
-  use worker::*;
-  //type Ptr<T> = Arc<Mutex<T> >;
-
-  #[test]
-  fn lab_test_1() {
-    let mut lab = Lab::new();
-
-    for i in 0..10 {
-      lab.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
-    }
-
-    assert_eq!(lab.borrow_crew_hash()
-                  .values()
-                  .fold(0, |count, worker| {
-                    assert_eq!(worker.lock().unwrap().get_loc(), Some(Loc::Lab) );
-                    count + 1
-                  }), 10);
-  }
-
-  #[test]
-  fn lab_test_2() {
-      
-  }
-}
+mod tests;

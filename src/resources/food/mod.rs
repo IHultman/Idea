@@ -86,18 +86,18 @@ impl Sub<Food> for Food {
 }
 
 impl ResourceAccum for Food {
+  type Args = ();
+
   fn new_base() -> Food {
-    Food {
-      food: 0,
-    }
+    Food::new(0)
   }
 
-  fn produced(worker: Ptr<Worker>) -> Self {
+  fn produced(worker: Ptr<Worker>, args: () ) -> Self {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
       (worker.get_skill_lvl(Loc::Farm), worker.get_energy() )
     };
-    Self::new((PRODUCT * (lvl as f64) * energy ) as u64)
+    Food::new((PRODUCT * (lvl as f64) * energy ) as u64)
   }
 }
 
@@ -112,3 +112,6 @@ impl ResourceUpkeep for Food {
     }
   }
 }
+
+#[cfg(test)]
+mod tests;

@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use std::ops::{Add, Index, IndexMut};
 use std::sync::{Arc, Mutex};
 
@@ -38,13 +39,13 @@ pub struct CrystalBatch {
 impl CrystalBatch {
   pub fn new_random(mut crystals: u64, color: Color) -> Self {
     let mut other_colors = match color {
-        Color::Blue   => vec![Color::Green, Color::Purple, Color::Red, Color::Silver, Color::Yellow],
-        Color::Energy => panic!(),
-        Color::Green  => vec![Color::Blue, Color::Purple, Color::Red, Color::Silver, Color::Yellow],
-        Color::Purple => vec![Color::Green, Color::Blue, Color::Red, Color::Silver, Color::Yellow],
-        Color::Red    => vec![Color::Green, Color::Purple, Color::Blue, Color::Silver, Color::Yellow],
-        Color::Silver => vec![Color::Green, Color::Purple, Color::Red, Color::Blue, Color::Yellow],
-        Color::Yellow => vec![Color::Green, Color::Purple, Color::Red, Color::Silver, Color::Blue],
+      Color::Blue   => vec![Color::Green, Color::Purple, Color::Red, Color::Silver, Color::Yellow],
+      Color::Energy => panic!(),
+      Color::Green  => vec![Color::Blue, Color::Purple, Color::Red, Color::Silver, Color::Yellow],
+      Color::Purple => vec![Color::Green, Color::Blue, Color::Red, Color::Silver, Color::Yellow],
+      Color::Red    => vec![Color::Green, Color::Purple, Color::Blue, Color::Silver, Color::Yellow],
+      Color::Silver => vec![Color::Green, Color::Purple, Color::Red, Color::Blue, Color::Yellow],
+      Color::Yellow => vec![Color::Green, Color::Purple, Color::Red, Color::Silver, Color::Blue],
     };
     let random_colors_list = (1..6).rev()
                                    .map(|x| other_colors.remove(::rand::random::<usize>() % x) )
@@ -122,7 +123,21 @@ impl Add<CrystalBatch> for CrystalBatch {
   }
 }
 
+impl PartialEq<CrystalBatch> for CrystalBatch {
+  fn eq(&self, rhs: &Self) -> bool {
+    (self.blue   == rhs.blue) &&
+    (self.energy == rhs.energy) &&
+    (self.green  == rhs.green) &&
+    (self.purple == rhs.purple) &&
+    (self.red    == rhs.red) &&
+    (self.silver == rhs.silver) &&
+    (self.yellow == rhs.yellow)
+  }
+}
+
 impl ResourceAccum for CrystalBatch {
+  type Args = Color;
+
   fn new_base() -> Self {
     CrystalBatch {
       blue: 0,
@@ -135,11 +150,14 @@ impl ResourceAccum for CrystalBatch {
     }
   }
 
-  fn produced(worker: Ptr<Worker>) -> Self {
+  fn produced(worker: Ptr<Worker>, args: Color) -> Self {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
       (worker.get_skill_lvl(Loc::Mine), worker.get_energy() )
     };
-    Self::new_random(((PRODUCT * (lvl as f64) * energy) as u64), Color::Blue)
+    CrystalBatch::new_random(((PRODUCT * (lvl as f64) * energy) as u64), args)
   }
 }
+
+#[cfg(test)]
+mod tests;

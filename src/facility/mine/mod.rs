@@ -14,12 +14,14 @@ type Ptr<T> = Arc<Mutex<T> >;
 #[derive(Debug)]
 pub struct Mine {
   crew: HashMap<u8, Ptr<Worker> >,
+  loc_color: Color,
 }
 
 impl Mine {
   pub fn new() -> Self {
     Mine {
       crew: HashMap::new(),
+      loc_color: Color::Blue,
     }
   }
 }
@@ -40,36 +42,11 @@ impl Facility for Mine {
 
 impl Producer for Mine {
   type Resource = CrystalBatch;
+
+  fn get_producer_args(&self) -> <CrystalBatch as ResourceAccum>::Args {
+    self.loc_color
+  }
 }
 
 #[cfg(test)]
-mod tests {
-  use std::collections::HashMap;
-  use std::sync::{Arc, Mutex};
-  use facility::{Facility, Loc, Producer};
-  use resources::crystals::CrystalBatch;
-  use super::*;
-  use worker::*;
-  //type Ptr<T> = Arc<Mutex<T> >;
-
-  #[test]
-  fn mine_test_1() {
-    let mut mine = Mine::new();
-
-    for i in 0..10 {
-      mine.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
-    }
-
-    assert_eq!(mine.borrow_crew_hash()
-                   .values()
-                   .fold(0, |count, worker| {
-                     assert_eq!(worker.lock().unwrap().get_loc(), Some(Loc::Mine) );
-                     count + 1
-                   }), 10);
-  }
-
-  #[test]
-  fn mine_test_2() {
-
-  }
-}
+mod tests;

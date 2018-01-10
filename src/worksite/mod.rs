@@ -74,7 +74,7 @@ impl WorkSite {
           Loc::Mine           => self.mine.lock().unwrap().remove_unit(id),
           Loc::Ship           => self.ship.lock().unwrap().remove_unit(id),
           Loc::WaterProcessor => self.water_proc.lock().unwrap().remove_unit(id),
-        }
+        };
       },
       None => {},
     }

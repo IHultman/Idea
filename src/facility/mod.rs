@@ -66,12 +66,10 @@ pub trait Facility where
       unit.get_id()
     };
     self.borrow_crew_hash_mut().insert(id, unit);
-    println!("Unit {} just arrived at {:?}!", id, loc);
   }
 
-  fn remove_unit(&mut self, id: u8) {
-    println!("Unit {} is leaving {:?}!", id, self.get_loc() );
-    self.borrow_crew_hash_mut().remove(&id);
+  fn remove_unit(&mut self, id: u8) -> Option<Ptr<Worker> > {
+    self.borrow_crew_hash_mut().remove(&id)
   }
 
   fn exp_up(&mut self) {
@@ -95,72 +93,18 @@ pub trait Producer where
 {
   type Resource;
 
+  fn get_producer_args(&self) -> <Resource as ResourceAccum>::Args;
+
   fn harvest(&self) -> Self::Resource {
+    let args = self.get_producer_args();
     self.borrow_crew_hash()
         .iter()
-        .fold(
-          Self::Resource::new_base(),
-          |acc, (_,worker)| {
-            acc + Self::Resource::produced((*worker).clone() )
-          })
+        .fold(Self::Resource::new_base(),
+              |acc, (_,worker)| {
+                acc + Self::Resource::produced((*worker).clone(), args)
+              })
   }
 }
 
 #[cfg(test)]
-mod tests {
-  use std::collections::HashMap;
-  use std::cmp::{Ord, PartialEq};
-  use std::fmt::Debug;
-  use std::ops::{Add, Mul, Sub};
-  use std::sync::{Arc, Mutex};
-  use std::thread;
-  use resources::ResourceAccum;
-  use super::*;
-  use worker::Worker;
-  //type Ptr<T> = Arc<Mutex<T> >;
-
-  #[test]
-  fn facility_loc_test() {
-    assert_eq!(Loc::Academy, Loc::Academy);
-    assert_ne!(Loc::Academy, Loc::Farm);
-    assert_ne!(Loc::Academy, Loc::Lab);
-    assert_ne!(Loc::Academy, Loc::Mine);
-    assert_ne!(Loc::Academy, Loc::Ship);
-    assert_ne!(Loc::Academy, Loc::WaterProcessor);
-
-    assert_ne!(Loc::Farm, Loc::Academy);
-    assert_eq!(Loc::Farm, Loc::Farm);
-    assert_ne!(Loc::Farm, Loc::Lab);
-    assert_ne!(Loc::Farm, Loc::Mine);
-    assert_ne!(Loc::Farm, Loc::Ship);
-    assert_ne!(Loc::Farm, Loc::WaterProcessor);
-
-    assert_ne!(Loc::Lab, Loc::Academy);
-    assert_ne!(Loc::Lab, Loc::Farm);
-    assert_eq!(Loc::Lab, Loc::Lab);
-    assert_ne!(Loc::Lab, Loc::Mine);
-    assert_ne!(Loc::Lab, Loc::Ship);
-    assert_ne!(Loc::Lab, Loc::WaterProcessor);
-
-    assert_ne!(Loc::Mine, Loc::Academy);
-    assert_ne!(Loc::Mine, Loc::Farm);
-    assert_ne!(Loc::Mine, Loc::Lab);
-    assert_eq!(Loc::Mine, Loc::Mine);
-    assert_ne!(Loc::Mine, Loc::Ship);
-    assert_ne!(Loc::Mine, Loc::WaterProcessor);
-
-    assert_ne!(Loc::Ship, Loc::Academy);
-    assert_ne!(Loc::Ship, Loc::Farm);
-    assert_ne!(Loc::Ship, Loc::Lab);
-    assert_ne!(Loc::Ship, Loc::Mine);
-    assert_eq!(Loc::Ship, Loc::Ship);
-    assert_ne!(Loc::Ship, Loc::WaterProcessor);
-
-    assert_ne!(Loc::WaterProcessor, Loc::Academy);
-    assert_ne!(Loc::WaterProcessor, Loc::Farm);
-    assert_ne!(Loc::WaterProcessor, Loc::Lab);
-    assert_ne!(Loc::WaterProcessor, Loc::Mine);
-    assert_ne!(Loc::WaterProcessor, Loc::Ship);
-    assert_eq!(Loc::WaterProcessor, Loc::WaterProcessor);
-  }
-}
+mod tests;

@@ -86,18 +86,18 @@ impl Sub<Water> for Water {
 }
 
 impl ResourceAccum for Water {
+  type Args = ();
+
   fn new_base() -> Water {
-    Water {
-      water: 0,
-    }
+    Water::new(0)
   }
 
-  fn produced(worker: Ptr<Worker>) -> Self {
+  fn produced(worker: Ptr<Worker>, args: () ) -> Self {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
       (worker.get_skill_lvl(Loc::WaterProcessor), worker.get_energy() )
     };
-    Self::new((PRODUCT * (lvl as f64) * energy ) as u64)
+    Water::new((PRODUCT * (lvl as f64) * energy ) as u64)
   }
 }
 
@@ -112,3 +112,6 @@ impl ResourceUpkeep for Water {
     }
   }
 }
+
+#[cfg(test)]
+mod tests;
