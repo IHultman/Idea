@@ -16,10 +16,7 @@ type Ptr<T> = Arc<Mutex<T> >;
 pub trait ResourceAccum where
   Self: Add<Self, Output=Self> + Sized
 {
-  type Args;
-
   fn new_base() -> Self;
-  fn produced(Ptr<Worker>, Args) -> Self;
 }
 
 pub trait ResourceUpkeep where

@@ -9,8 +9,6 @@ use resources::{ResourceAccum, ResourceUpkeep};
 use worker::Worker;
 
 
-const PRODUCT: f64 = 25.0;
-
 type Ptr<T> = Arc<Mutex<T> >;
 
 
@@ -86,12 +84,10 @@ impl Sub<Food> for Food {
 }
 
 impl ResourceAccum for Food {
-  type Args = ();
-
   fn new_base() -> Food {
     Food::new(0)
   }
-
+/*
   fn produced(worker: Ptr<Worker>, args: () ) -> Self {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
@@ -99,6 +95,7 @@ impl ResourceAccum for Food {
     };
     Food::new((PRODUCT * (lvl as f64) * energy ) as u64)
   }
+*/
 }
 
 impl ResourceUpkeep for Food {

@@ -11,6 +11,9 @@ use worker::Worker;
 type Ptr<T> = Arc<Mutex<T> >;
 
 
+const PRODUCT: f64 = 25.0;
+
+
 #[derive(Debug)]
 pub struct Farm {
   crew: HashMap<u8, Ptr<Worker> >,
@@ -43,6 +46,14 @@ impl Producer for Farm {
 
   fn get_producer_args(&self) -> <Food as ResourceAccum>::Args {
     ()
+  }
+
+  fn produce(worker: Ptr<Worker>, _: () ) -> Food {
+    let (lvl, energy) = {
+      let worker = worker.lock().unwrap();
+      (worker.get_skill_lvl(Loc::Farm), worker.get_energy() )
+    };
+    Food::new((PRODUCT * (lvl as f64) * energy ) as u64)
   }
 }
 

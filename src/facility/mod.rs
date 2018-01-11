@@ -91,9 +91,11 @@ pub trait Producer where
   Self: Facility,
   Self::Resource: ResourceAccum + Debug,
 {
+  type ProduceArgs;
   type Resource;
 
-  fn get_producer_args(&self) -> <Resource as ResourceAccum>::Args;
+  fn get_produce_args(&self) -> ProduceArgs;
+  fn produce(Ptr<Worker>, ProduceArgs) -> Resource;
 
   fn harvest(&self) -> Self::Resource {
     let args = self.get_producer_args();
@@ -101,7 +103,7 @@ pub trait Producer where
         .iter()
         .fold(Self::Resource::new_base(),
               |acc, (_,worker)| {
-                acc + Self::Resource::produced((*worker).clone(), args)
+                acc + Self::produce((*worker).clone(), self.get_produce_args() )
               })
   }
 }

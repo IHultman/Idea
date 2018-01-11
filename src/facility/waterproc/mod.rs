@@ -11,6 +11,9 @@ use worker::Worker;
 type Ptr<T> = Arc<Mutex<T> >;
 
 
+const PRODUCT: f64 = 25.0;
+
+
 #[derive(Debug)]
 pub struct WaterProcessor {
   crew: HashMap<u8, Ptr<Worker> >,
@@ -43,6 +46,14 @@ impl Producer for WaterProcessor {
 
   fn get_producer_args(&self) -> <Water as ResourceAccum>::Args {
     ()
+  }
+
+  fn produce(worker: Ptr<Worker>, _: () ) -> Water {
+    let (lvl, energy) = {
+      let worker = worker.lock().unwrap();
+      (worker.get_skill_lvl(Loc::WaterProcessor), worker.get_energy() )
+    };
+    Water::new((PRODUCT * (lvl as f64) * energy ) as u64)
   }
 }
 

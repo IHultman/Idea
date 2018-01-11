@@ -87,6 +87,7 @@ fn food_sub_test_3() {
   assert_eq!(f1 - f2, f2 - f1);
 }
 
+/*
 #[test]
 fn food_resorceaccum_test() {
   let mut food = Food::new_base();
@@ -107,3 +108,4 @@ fn food_resorceaccum_test() {
   food = food + Food::produced(worker.clone(), () );
   assert_eq!(food, Food::new((PRODUCT * 3.0 - 1.0) as u64) )
 }
+*/

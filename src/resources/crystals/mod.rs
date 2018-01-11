@@ -136,8 +136,6 @@ impl PartialEq<CrystalBatch> for CrystalBatch {
 }
 
 impl ResourceAccum for CrystalBatch {
-  type Args = Color;
-
   fn new_base() -> Self {
     CrystalBatch {
       blue: 0,
@@ -149,7 +147,7 @@ impl ResourceAccum for CrystalBatch {
       yellow: 0,
     }
   }
-
+/*
   fn produced(worker: Ptr<Worker>, args: Color) -> Self {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
@@ -157,6 +155,7 @@ impl ResourceAccum for CrystalBatch {
     };
     CrystalBatch::new_random(((PRODUCT * (lvl as f64) * energy) as u64), args)
   }
+*/
 }
 
 #[cfg(test)]

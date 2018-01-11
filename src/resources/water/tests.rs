@@ -87,6 +87,7 @@ fn water_sub_test_3() {
   assert_eq!(w2 - w1, Water::new(0) );
 }
 
+/*
 #[test]
 fn water_resorceaccum_test() {
   let mut water = Water::new_base();
@@ -107,3 +108,4 @@ fn water_resorceaccum_test() {
   water = water + Water::produced(worker.clone(), () );
   assert_eq!(water, Water::new((PRODUCT * 3.0 - 1.0) as u64) )
 }
+*/
