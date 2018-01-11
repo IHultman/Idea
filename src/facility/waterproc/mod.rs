@@ -42,9 +42,10 @@ impl Facility for WaterProcessor {
 }
 
 impl Producer for WaterProcessor {
+  type ProduceArgs = ();
   type Resource = Water;
 
-  fn get_producer_args(&self) -> <Water as ResourceAccum>::Args {
+  fn get_producer_args(&self) {
     ()
   }
 

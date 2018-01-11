@@ -42,9 +42,10 @@ impl Facility for Farm {
 }
 
 impl Producer for Farm {
+  type ProduceArgs = ();
   type Resource = Food;
 
-  fn get_producer_args(&self) -> <Food as ResourceAccum>::Args {
+  fn get_producer_args(&self) {
     ()
   }
 

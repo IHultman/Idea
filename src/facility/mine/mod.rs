@@ -41,10 +41,20 @@ impl Facility for Mine {
 }
 
 impl Producer for Mine {
+  type ProduceArgs = Color;
   type Resource = CrystalBatch;
 
   fn get_producer_args(&self) -> <CrystalBatch as ResourceAccum>::Args {
     self.loc_color
+  }
+
+  fn produce(worker: Ptr<Worker>, color: Color) -> CrystalBatch {
+    a
+    let (lvl, energy) = {
+      let worker = worker.lock().unwrap();
+      (worker.get_skill_lvl(Loc::Mine), worker.get_energy() )
+    };
+    CrystalBatch::new_random(((PRODUCT * (lvl as f64) * energy) as u64), color)
   }
 }
 
