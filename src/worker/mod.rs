@@ -1,4 +1,4 @@
-use facility::Loc;
+use facility::location::Loc;
 
 const LEVELS: [u32; 10] = [0, 50, 100, 200, 350, 500, 750, 1000, 1500, 2000];
 

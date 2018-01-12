@@ -1,14 +1,18 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use facility::{Facility, Loc, Producer};
+use facility::{Facility, Producer};
+use facility::location::Loc;
 
-use resources::crystals::CrystalBatch;
+use resources::crystals::{Color, CrystalBatch};
 
 use worker::Worker;
 
 
 type Ptr<T> = Arc<Mutex<T> >;
+
+
+const PRODUCT: f64 = 25.0;
 
 
 #[derive(Debug)]
@@ -44,17 +48,16 @@ impl Producer for Mine {
   type ProduceArgs = Color;
   type Resource = CrystalBatch;
 
-  fn get_producer_args(&self) -> <CrystalBatch as ResourceAccum>::Args {
+  fn get_produce_args(&self) -> Color {
     self.loc_color
   }
 
-  fn produce(worker: Ptr<Worker>, color: Color) -> CrystalBatch {
-    a
+  fn produce(worker: Ptr<Worker>, color: &Color) -> CrystalBatch {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
       (worker.get_skill_lvl(Loc::Mine), worker.get_energy() )
     };
-    CrystalBatch::new_random(((PRODUCT * (lvl as f64) * energy) as u64), color)
+    CrystalBatch::new_random(((PRODUCT * (lvl as f64) * energy) as u64), *color)
   }
 }
 

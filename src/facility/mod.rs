@@ -5,6 +5,8 @@ use std::ops::{Add, Mul, Sub};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+use facility::location::Loc;
+
 use resources::ResourceAccum;
 
 use worker::Worker;
@@ -13,6 +15,7 @@ use worker::Worker;
 pub mod academy;
 pub mod farm;
 pub mod lab;
+pub mod location;
 pub mod mine;
 pub mod ship;
 pub mod waterproc;
@@ -22,29 +25,6 @@ const EXP: u16 = 25;
 
 type Ptr<T> = Arc<Mutex<T> >;
 
-
-#[derive(Clone, Copy, Debug)]
-pub enum Loc {
-  Academy,
-  Farm,
-  Lab,
-  Mine,
-  Ship,
-  WaterProcessor,
-}
-
-impl PartialEq<Loc> for Loc {
-  fn eq(&self, other: &Self) -> bool {
-    match *self {
-      Loc::Academy        => if let Loc::Academy = *other {true} else {false},
-      Loc::Farm           => if let Loc::Farm = *other {true} else {false},
-      Loc::Lab            => if let Loc::Lab = *other {true} else {false},
-      Loc::Mine           => if let Loc::Mine = *other {true} else {false},
-      Loc::Ship           => if let Loc::Ship = *other {true} else {false},
-      Loc::WaterProcessor => if let Loc::WaterProcessor = *other {true} else {false},
-    }
-  }
-}
 
 pub trait Facility where
   Self: Send + 'static
@@ -94,16 +74,16 @@ pub trait Producer where
   type ProduceArgs;
   type Resource;
 
-  fn get_produce_args(&self) -> ProduceArgs;
-  fn produce(Ptr<Worker>, ProduceArgs) -> Resource;
+  fn get_produce_args(&self) -> Self::ProduceArgs;
+  fn produce(Ptr<Worker>, &Self::ProduceArgs) -> Self::Resource;
 
   fn harvest(&self) -> Self::Resource {
-    let args = self.get_producer_args();
+    let args = self.get_produce_args();
     self.borrow_crew_hash()
         .iter()
         .fold(Self::Resource::new_base(),
               |acc, (_,worker)| {
-                acc + Self::produce((*worker).clone(), self.get_produce_args() )
+                acc + Self::produce((*worker).clone(), &args)
               })
   }
 }

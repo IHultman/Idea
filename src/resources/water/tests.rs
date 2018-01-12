@@ -1,7 +1,7 @@
 use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::ops::{Add, Deref, Mul, Sub};
 use std::sync::{Arc, Mutex};
-use facility::Loc;
+use facility::location::Loc;
 use resources::{ResourceAccum, ResourceUpkeep};
 use super::*;
 use worker::*;
@@ -86,26 +86,3 @@ fn water_sub_test_3() {
 
   assert_eq!(w2 - w1, Water::new(0) );
 }
-
-/*
-#[test]
-fn water_resorceaccum_test() {
-  let mut water = Water::new_base();
-
-  let mut worker = Arc::new(Mutex::new(Worker::new(0)) );
-  water = water + Water::produced(worker.clone(), () );
-  assert_eq!(water, Water::new(PRODUCT as u64) );
-  {
-    worker.lock().unwrap().remove_energy(0.5);
-  }
-  water = water + Water::produced(worker.clone(), () );
-  assert_eq!(water, Water::new((PRODUCT * 1.5) as u64) );
-  {
-    let mut worker = worker.lock().unwrap();
-    worker.set_loc(Loc::WaterProcessor);
-    worker.add_exp(100);
-  }
-  water = water + Water::produced(worker.clone(), () );
-  assert_eq!(water, Water::new((PRODUCT * 3.0 - 1.0) as u64) )
-}
-*/

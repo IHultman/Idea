@@ -1,4 +1,4 @@
-use facility::Loc;
+use facility::location::Loc;
 use super::*;
 
 #[test]

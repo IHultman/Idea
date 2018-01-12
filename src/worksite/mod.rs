@@ -2,10 +2,11 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
 
-use facility::{Facility, Loc, Producer};
+use facility::{Facility, Producer};
 use facility::academy::Academy;
 use facility::farm::Farm;
 use facility::lab::Lab;
+use facility::location::Loc;
 use facility::mine::Mine;
 use facility::ship::Ship;
 use facility::waterproc::WaterProcessor;

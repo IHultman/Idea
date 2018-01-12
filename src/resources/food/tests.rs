@@ -1,7 +1,7 @@
 use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::ops::{Add, Deref, Mul, Sub};
 use std::sync::{Arc, Mutex};
-use facility::Loc;
+use facility::location::Loc;
 use resources::{ResourceAccum, ResourceUpkeep};
 use super::*;
 use worker::*;
@@ -86,26 +86,3 @@ fn food_sub_test_3() {
 
   assert_eq!(f1 - f2, f2 - f1);
 }
-
-/*
-#[test]
-fn food_resorceaccum_test() {
-  let mut food = Food::new_base();
-
-  let mut worker = Arc::new(Mutex::new(Worker::new(0)) );
-  food = food + Food::produced(worker.clone(), () );
-  assert_eq!(food, Food::new(PRODUCT as u64) );
-  {
-    worker.lock().unwrap().remove_energy(0.5);
-  }
-  food = food + Food::produced(worker.clone(), () );
-  assert_eq!(food, Food::new((PRODUCT * 1.5) as u64) );
-  {
-    let mut worker = worker.lock().unwrap();
-    worker.set_loc(Loc::Farm);
-    worker.add_exp(100);
-  }
-  food = food + Food::produced(worker.clone(), () );
-  assert_eq!(food, Food::new((PRODUCT * 3.0 - 1.0) as u64) )
-}
-*/

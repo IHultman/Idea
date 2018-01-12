@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use facility::{Facility, Loc, Producer, EXP};
+use facility::{Facility, Producer, EXP};
+use facility::location::Loc;
 use resources::crystals::*;
 use super::*;
 use worker::*;

@@ -2,7 +2,7 @@ use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::ops::{Add, Deref, Mul, Sub};
 use std::sync::{Arc, Mutex};
 
-use facility::Loc;
+use facility::location::Loc;
 
 use resources::{ResourceAccum, ResourceUpkeep};
 
@@ -87,15 +87,6 @@ impl ResourceAccum for Food {
   fn new_base() -> Food {
     Food::new(0)
   }
-/*
-  fn produced(worker: Ptr<Worker>, args: () ) -> Self {
-    let (lvl, energy) = {
-      let worker = worker.lock().unwrap();
-      (worker.get_skill_lvl(Loc::Farm), worker.get_energy() )
-    };
-    Food::new((PRODUCT * (lvl as f64) * energy ) as u64)
-  }
-*/
 }
 
 impl ResourceUpkeep for Food {

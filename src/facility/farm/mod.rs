@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use facility::{Facility, Loc, Producer};
+use facility::{Facility, Producer};
+use facility::location::Loc;
 
 use resources::food::Food;
 
@@ -45,11 +46,9 @@ impl Producer for Farm {
   type ProduceArgs = ();
   type Resource = Food;
 
-  fn get_producer_args(&self) {
-    ()
-  }
+  fn get_produce_args(&self) {()}
 
-  fn produce(worker: Ptr<Worker>, _: () ) -> Food {
+  fn produce(worker: Ptr<Worker>, _: &() ) -> Food {
     let (lvl, energy) = {
       let worker = worker.lock().unwrap();
       (worker.get_skill_lvl(Loc::Farm), worker.get_energy() )

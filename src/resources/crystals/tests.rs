@@ -1,6 +1,6 @@
 use std::ops::{Add, Index, IndexMut};
 use std::sync::{Arc, Mutex};
-use facility::Loc;
+use facility::location::Loc;
 use resources::ResourceAccum;
 use super::*;
 use worker::*;
