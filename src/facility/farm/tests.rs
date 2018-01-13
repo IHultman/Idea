@@ -99,12 +99,39 @@ fn farm_facility_test_5() {
 }
 
 #[test]
-fn farm_producer_test_1() {
+fn farm_producer_test() {
   let mut farm = Farm::new();
 
   for i in 0..10 {
     farm.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
   }
 
-  //assert_eq!(farm.harvest(), )
+  assert_eq!(farm.harvest(), Food::new((PRODUCT as u64) * 10) );
+
+  for _ in 0..2 {
+    farm.exp_up();
+  }
+
+  assert_eq!(farm.harvest(), Food::new((PRODUCT as u64) * 20) );
+
+  farm.borrow_crew_hash()
+      .into_iter()
+      .map(|(_,worker)|
+        worker.lock().unwrap().remove_energy(1.0)
+      )
+      .collect::<Vec<()> >();
+
+  assert_eq!(farm.harvest(), Food::new((PRODUCT as u64) * 2) );
+
+  for i in 10..15 {
+    farm.add_unit(Arc::new(Mutex::new(Worker::new(i))) );
+  }
+
+  assert_eq!(farm.harvest(), Food::new((PRODUCT as u64) * 7) );
+
+  for i in 0..10 {
+    farm.remove_unit(i);
+  }
+
+  assert_eq!(farm.harvest(), Food::new((PRODUCT as u64) * 5) );
 }

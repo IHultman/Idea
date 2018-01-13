@@ -293,9 +293,4 @@ impl TechState {
 */
 
 #[cfg(test)]
-mod tests {
-  #[test]
-  fn tech_test() {
-
-  }
-}
+mod tests;
