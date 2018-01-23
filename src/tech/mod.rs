@@ -40,11 +40,17 @@ impl TechDiGraph {
       Ok(() )
     }
   }
-/*
+
   pub fn add_advanced_link(&mut self, prereq: Tech, adv: Tech) -> Result<(), String> {
-    let prereq_ref_mut: Option<&mut TechNode> = Self::get_node_ref_mut(&mut self.prereqs);
+    if prereq == adv {
+      return Err("add_advanced_link(): Trying to link from tech to itself".to_string() );
+    }
+
+    let prereq_ref_mut: Option<&mut TechNode> = {
+      get_node_ref_mut(&mut self.prereqs).or_else(|| get_node_ref_mut(&mut self.advanced) )
+    };
     if prereq_ref_mut.is_none() {
-      return Err("Invalid prerequisite tech name".to_string() );
+      return Err("add_advanced_link(): Prereq tech does not exit".to_string() );
     }
 
     let mut adv_ref_mut: Option<&mut TechNode> = Self::get_node_ref_mut(&mut self.advanced);
@@ -73,7 +79,7 @@ impl TechDiGraph {
 
     Ok(() )
   }
-*/
+
   fn get_node_ref<'a>(nodes: &'a [TechNode], tech: Tech) -> Option<&'a TechNode> {
     for node in nodes {
       if node.get_tech_name() == tech {
