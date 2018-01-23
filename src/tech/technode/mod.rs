@@ -18,7 +18,7 @@ impl TechNode {
   pub fn new(name: Tech) -> Self {
     TechNode {
       tech_name: name,
-      available: false,
+      available: true,
       researched: false,
       acquired_in_edges: None,
       unacquired_in_edges: None,
@@ -26,14 +26,47 @@ impl TechNode {
     }
   }
 
-  pub fn add_in_edge(&mut self, tech: *const TechNode) {
+  pub fn add_in_edge(&mut self, tech: *const TechNode) -> Result<(), String> {
+    if let Some(ref vec) = self.acquired_in_edges {
+      for tech_ptr in vec {
+        unsafe {
+          if (**tech_ptr).tech_name == (*tech).tech_name {
+            return Err("add_in_edge(): Tech already inserted to in-edges".to_string() );
+          }
+        }
+      }
+    }
+
     let vec: &mut Vec<*const TechNode> = self.unacquired_in_edges.get_or_insert(Vec::new() );
+    for tech_ptr in &*vec {
+      unsafe {
+        if (**tech_ptr).tech_name == (*tech).tech_name {
+          return Err("add_in_edge(): Tech already inserted to in-edges".to_string() );
+        }
+      }
+    }
+
     vec.push(tech);
+    self.available = false;
+    Ok(() )
   }
 
-  pub fn add_out_edge(&mut self, tech: *mut TechNode) {
+  pub fn add_out_edge(&mut self, tech: *mut TechNode) -> Result<(), String> {
     let vec: &mut Vec<*mut TechNode> = self.out_edges.get_or_insert(Vec::new() );
+    for tech_ptr in &*vec {
+      unsafe {
+        if (**tech_ptr).tech_name == (*tech).tech_name {
+          return Err("add_out_edge(): Tech already inserted to out edges".to_string() );
+        }
+      }
+    }
+
     vec.push(tech);
+    Ok(() )
+  }
+
+  pub fn get_tech_name(&self) -> Tech {
+    self.tech_name
   }
 
   pub fn mark_researched(&mut self) -> Result<(), String> {
@@ -41,10 +74,10 @@ impl TechNode {
       if !self.researched {
         self.researched = true
       } else {
-        return Err("Already researched".to_string() );
+        return Err("mark_researched(): Tech already researched".to_string() );
       }
     } else {
-      return Err("Prerequisites not met".to_string() );
+      return Err("mark_researched(): Prerequisites not met".to_string() );
     }
 
     let this_addr = self as *const TechNode;
@@ -78,11 +111,11 @@ impl TechNode {
             empty = true;
           }
         } else {
-          return Err("Link to tech not found".to_string() );
+          return Err("move_link_acquired(): Link to tech not found".to_string() );
         }
       },
       None => {
-        return Err("Link to tech not found".to_string() );
+        return Err("move_link_acquired(): Link to tech not found".to_string() );
       },
     }
 

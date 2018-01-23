@@ -28,14 +28,19 @@ impl TechDiGraph {
       advanced: Vec::new(),
     }
   }
-}
-/*
-  pub fn add_prereq(&mut self, tech: Tech) {
-    if Self::get_node_ref(&self.prereqs, tech).is_none() {
+
+
+  pub fn add_prereq(&mut self, tech: Tech) -> Result<(), String> {
+    if Self::get_node_ref(&self.advanced, tech).is_some() {
+      Err("add_prereq(): Tech already added to advanced list".to_string() )
+    } else if Self::get_node_ref(&self.prereqs, tech).is_some() {
+      Err("add_prereq(): Tech already added to preqreq list".to_string() )
+    } else {
       self.prereqs.push(TechNode::new(tech) );
+      Ok(() )
     }
   }
-
+/*
   pub fn add_advanced_link(&mut self, prereq: Tech, adv: Tech) -> Result<(), String> {
     let prereq_ref_mut: Option<&mut TechNode> = Self::get_node_ref_mut(&mut self.prereqs);
     if prereq_ref_mut.is_none() {
@@ -68,25 +73,27 @@ impl TechDiGraph {
 
     Ok(() )
   }
-
+*/
   fn get_node_ref<'a>(nodes: &'a [TechNode], tech: Tech) -> Option<&'a TechNode> {
     for node in nodes {
-      if node.tech_name == tech {
+      if node.get_tech_name() == tech {
         return Some(node);
       }
     }
+
     None
   }
 
   fn get_node_ref_mut<'a>(nodes: &'a mut [TechNode], tech: Tech) -> Option<&'a mut TechNode> {
     for node in nodes {
-      if node.tech_name == tech {
+      if node.get_tech_name() == tech {
         return Some(node);
       }
     }
+
     None
   }
-
+/*
   pub fn mark_studied(&mut self, tech: Tech) -> Result<(), String> {
     let mut node_ref = Self::get_node_ref_mut(&mut self.prereqs, tech);
     if node_ref.is_none() {
@@ -100,8 +107,8 @@ impl TechDiGraph {
 
     node_ref.mark_researched()
   }
-}
 */
+}
 
 pub struct TechState {
   properties: CrystalProperties,
