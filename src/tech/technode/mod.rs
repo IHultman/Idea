@@ -65,6 +65,10 @@ impl TechNode {
     Ok(() )
   }
 
+  pub fn get_out_edges(&self) -> Option<&Vec<*mut TechNode> > {
+    self.out_edges.as_ref()
+  }
+
   pub fn get_tech_name(&self) -> Tech {
     self.tech_name
   }
