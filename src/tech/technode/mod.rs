@@ -27,6 +27,10 @@ impl TechNode {
   }
 
   pub fn add_in_edge(&mut self, tech: *const TechNode) -> Result<(), String> {
+  // Only insert TechNode ptr into unacquired_in_edges if there is not already a ptr
+  // to a TechNode with the same tech_name field already inserted to either
+  // unacquired_in_edges or acquired_in_edges
+
     if let Some(ref vec) = self.acquired_in_edges {
       for tech_ptr in vec {
         unsafe {
@@ -52,6 +56,9 @@ impl TechNode {
   }
 
   pub fn add_out_edge(&mut self, tech: *mut TechNode) -> Result<(), String> {
+  // Only insert TechNode ptr into out_edges if there is not already a ptr
+  // to a TechNode with the same tech_name field already inserted
+
     let vec: &mut Vec<*mut TechNode> = self.out_edges.get_or_insert(Vec::new() );
     for tech_ptr in &*vec {
       unsafe {

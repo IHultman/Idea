@@ -9,7 +9,7 @@ use self::technode::*;
 
 
 pub mod crystalprop;
-pub mod technode;
+mod technode;
 
 
 type Ptr<T> = Arc<Mutex<T> >;
@@ -33,7 +33,7 @@ impl TechDiGraph {
   pub fn add_prereq(&mut self, tech: Tech) -> Result<(), String> {
     if Self::get_node_ref(&self.advanced, tech).is_some() {
       Err("add_prereq(): Tech already added to advanced list".to_string() )
-  } else if Self::get_node_ref(&self.prereqs, tech).is_some() {
+    } else if Self::get_node_ref(&self.prereqs, tech).is_some() {
       Err("add_prereq(): Tech already added to preqreq list".to_string() )
     } else {
       self.prereqs.push(TechNode::new(tech) );
@@ -41,77 +41,83 @@ impl TechDiGraph {
     }
   }
 
+/*
+  pub fn add_prereq(&mut self, tech: Tech) -> Result<(), String> {
+    Self::get_node_ref(&self.advanced, tech).
+    map_or(Some(() ), |_| None).
+    ok_or("add_prereq(): Tech already added to advanced list".to_string() )?;
+
+    Self::get_node_ref(&self.prereqs, tech).
+    map_or(Some(() ), |_| None).
+    ok_or("add_prereq(): Tech already added to prereq list".to_string() )?;
+
+    self.prereqs.push(TechNode::new(tech) );
+    Ok(() )
+  }
+*/
+
   pub fn add_advanced_link(&mut self, prereq: Tech, adv: Tech) -> Result<(), String> {
     if prereq == adv {
       return Err("add_advanced_link(): Trying to link from tech to itself".to_string() );
     }
 
-    let prereq_ptr_mut_result: (usize, *mut TechNode) = {
+    if Self::get_node_ref(&self.prereqs, adv).is_some() {
+      return Err("add_advanced_link(): Trying to link to an illegal tech".to_string() );
+    }
+
+    let prereq_ptr_mut: *mut TechNode = {
       let (prereqs, advanced) = (&mut self.prereqs, &mut self.advanced);
       Self::get_node_ref_mut(prereqs, prereq).
       or_else(move || Self::get_node_ref_mut(advanced, prereq) ).
-      map(|(i, r)| (i, r as *mut TechNode) ).
+      map(|r| r as *mut TechNode).
       ok_or("add_advanced_link(): Prereq tech does not exist".to_string() )?
     };
 
-    let adv_ptr_mut_result: (usize, *mut TechNode) = {
+    let adv_ptr_mut: *mut TechNode = {
       Self::get_node_ref_mut(&mut self.advanced, adv).
-      map(|(i, r)| (i, r as *mut TechNode) ).
-      unwrap_or_else(|| {
+      map(|r| r as *mut TechNode).
+      or_else(|| {
           self.advanced.push(TechNode::new(adv) );
-          ((self.advanced.len() - 1), (self.advanced.last_mut().unwrap() as *mut TechNode) )
-      })
+          self.advanced.last_mut().
+          map(|r| r as *mut TechNode)
+      }).
+      ok_or("add_advanced_link(): Adv cannot be inserted to digraph".to_string() )?
     };
 
-    if prereq_ptr_mut_result.1 == adv_ptr_mut_result.1 {
+    if prereq_ptr_mut == adv_ptr_mut {
       return Err("add_advanced_link(): Trying to link from tech to itself".to_string() );
     }
 
     let prereq_ref_mut = unsafe {
-      (prereq_ptr_mut_result.1).
-      as_mut().
+      prereq_ptr_mut.as_mut().
       ok_or("add_advanced_link(): Prereq tech does not exist".to_string() )?
     };
 
     let adv_ref_mut = unsafe {
-      (adv_ptr_mut_result.1).
-      as_mut().
+      adv_ptr_mut.as_mut().
       ok_or("add_advanced_link(): Adv tech does not exist after insert".to_string() )?
     };
 
-    if {
-      let mut edge_exists = false;
-      if let Some(node_ptrs) = prereq_ref_mut.get_out_edges() {
-        for node in node_ptrs {
-          if (*node) == (adv_ref_mut as *mut TechNode) {
-            edge_exists = true;
-            break;
-          }
-        }
-      }
-      !edge_exists
-    } {
-      prereq_ref_mut.add_out_edge(adv_ref_mut as *mut TechNode);
-      adv_ref_mut.add_in_edge(prereq_ref_mut as *const TechNode);
-    }
+    prereq_ref_mut.add_out_edge(adv_ref_mut as *mut TechNode)?;
+    adv_ref_mut.add_in_edge(prereq_ref_mut as *const TechNode)?;
 
     Ok(() )
   }
 
-  fn get_node_ref<'a>(nodes: &'a [TechNode], tech: Tech) -> Option<(usize, &'a TechNode)> {
-    for (i, node) in nodes.into_iter().enumerate() {
+  fn get_node_ref<'a>(nodes: &'a [TechNode], tech: Tech) -> Option<&'a TechNode> {
+    for node in nodes {
       if node.get_tech_name() == tech {
-        return Some((i, node) );
+        return Some(node);
       }
     }
 
     None
   }
 
-  fn get_node_ref_mut<'a>(nodes: &'a mut [TechNode], tech: Tech) -> Option<(usize, &'a mut TechNode)> {
-    for (i, node) in nodes.into_iter().enumerate() {
+  fn get_node_ref_mut<'a>(nodes: &'a mut [TechNode], tech: Tech) -> Option<&'a mut TechNode> {
+    for node in nodes {
       if node.get_tech_name() == tech {
-        return Some((i, node) );
+        return Some(node);
       }
     }
 
