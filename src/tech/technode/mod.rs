@@ -72,12 +72,20 @@ impl TechNode {
     Ok(() )
   }
 
+  pub fn get_acquired_in_edges(&self) -> Option<&Vec<*const TechNode> > {
+    self.acquired_in_edges.as_ref()
+  }
+
   pub fn get_out_edges(&self) -> Option<&Vec<*mut TechNode> > {
     self.out_edges.as_ref()
   }
 
   pub fn get_tech_name(&self) -> Tech {
     self.tech_name
+  }
+
+  pub fn get_unacquired_in_edges(&self) -> Option<&Vec<*const TechNode> > {
+    self.unacquired_in_edges.as_ref()
   }
 
   pub fn mark_researched(&mut self) -> Result<(), String> {
