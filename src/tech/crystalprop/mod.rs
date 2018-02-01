@@ -1,3 +1,4 @@
+use std::convert::From;
 use std::ops::{Index, IndexMut};
 use std::sync::{Arc, Mutex, Weak};
 
@@ -34,14 +35,29 @@ pub enum Tech {
 impl PartialEq<Tech> for Tech {
   fn eq(&self, other: &Self) -> bool {
     match (*self) {
-      Tech::Antimatter     => if let Tech::Antimatter = (*other) {true} else {false}
-      Tech::Earthquake     => if let Tech::Earthquake = (*other) {true} else {false}
-      Tech::EnergyShield   => if let Tech::EnergyShield = (*other) {true} else {false}
-      Tech::Flight         => if let Tech::Flight = (*other) {true} else {false}
-      Tech::Teleport       => if let Tech::Teleport = (*other) {true} else {false}
-      Tech::Walls          => if let Tech::Walls = (*other) {true} else {false}
-      Tech::WarningSystem  => if let Tech::WarningSystem = (*other) {true} else {false}
-      Tech::WeatherControl => if let Tech::WeatherControl = (*other) {true} else {false}
+      Tech::Antimatter     => if let Tech::Antimatter = (*other) {true} else {false},
+      Tech::Earthquake     => if let Tech::Earthquake = (*other) {true} else {false},
+      Tech::EnergyShield   => if let Tech::EnergyShield = (*other) {true} else {false},
+      Tech::Flight         => if let Tech::Flight = (*other) {true} else {false},
+      Tech::Teleport       => if let Tech::Teleport = (*other) {true} else {false},
+      Tech::Walls          => if let Tech::Walls = (*other) {true} else {false},
+      Tech::WarningSystem  => if let Tech::WarningSystem = (*other) {true} else {false},
+      Tech::WeatherControl => if let Tech::WeatherControl = (*other) {true} else {false},
+    }
+  }
+}
+
+impl From<Tech> for String {
+  fn from(t: Tech) -> String {
+    match t {
+      Tech::Antimatter     => "Antimatter".to_string(),
+      Tech::Earthquake     => "Earthquake".to_string(),
+      Tech::EnergyShield   => "EnergyShield".to_string(),
+      Tech::Flight         => "Flight".to_string(),
+      Tech::Teleport       => "Teleport".to_string(),
+      Tech::Walls          => "Walls".to_string(),
+      Tech::WarningSystem  => "WarningSystem".to_string(),
+      Tech::WeatherControl => "WeatherControl".to_string(),
     }
   }
 }

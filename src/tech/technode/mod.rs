@@ -76,6 +76,20 @@ impl TechNode {
     self.acquired_in_edges.as_ref()
   }
 
+  pub fn get_all_in_edges(&self) -> Option<Vec<*const TechNode> > {
+    self.get_acquired_in_edges().
+    map(|rv| {
+      let mut v = rv.clone();
+      self.get_unacquired_in_edges().
+      map(|rv| v.extend_from_slice(rv) );
+      v
+    }).
+    or_else(|| {
+      self.get_unacquired_in_edges().
+      map(|rv| rv.clone() )
+    })
+  }
+
   pub fn get_out_edges(&self) -> Option<&Vec<*mut TechNode> > {
     self.out_edges.as_ref()
   }
@@ -96,23 +110,36 @@ impl TechNode {
         return Err("mark_researched(): Tech already researched".to_string() );
       }
     } else {
-      return Err("mark_researched(): Prerequisites not met".to_string() );
+      return Err("mark_researched(): Prerequisites not met".to_string());
     }
 
     let this_addr = self as *const TechNode;
+    let mut is_problem = false;
+    let mut err_results = "mark_researched(): ".to_string();
     if let Some(ref mut node_ptrs) = self.out_edges {
       for node in node_ptrs {
         unsafe {
-          (**node).move_link_acquired(this_addr)?;
+          if let Err(e) = (**node).move_link_acquired(this_addr) {
+            is_problem = true;
+            err_results.push_str(&*e);
+            err_results.push_str(", ");
+          }
         }
       }
     }
 
-    Ok(() )
+    if is_problem {
+      err_results.pop();
+      err_results.pop();
+      Err(err_results)
+    } else {
+      Ok(() )
+    }
   }
 
   unsafe fn move_link_acquired(&mut self, tech_ptr: *const TechNode) -> Result<(), String> {
     let mut empty = false;
+    let mut check_acquired = false;
     match self.unacquired_in_edges {
       Some(ref mut node_ptrs) => {
         let mut to_move = None;
@@ -130,12 +157,23 @@ impl TechNode {
             empty = true;
           }
         } else {
-          return Err("move_link_acquired(): Link to tech not found".to_string() );
+          check_acquired = true;
         }
       },
       None => {
-        return Err("move_link_acquired(): Link to tech not found".to_string() );
+        check_acquired = true;
       },
+    }
+
+    if check_acquired {
+      if let Some(ref node_ptrs) = self.acquired_in_edges {
+        for node in node_ptrs {
+          if (*node) == tech_ptr {
+            return Err("move_link_acquired(): Link to tech already moved".to_string() );
+          }
+        }
+      }
+      return Err("move_link_acquired(): Link to tech not found".to_string() );
     }
 
     if empty {

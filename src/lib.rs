@@ -1,6 +1,8 @@
+extern crate colored;
 extern crate rand;
 
-use self::rand::Rng;
+use colored::*;
+use rand::Rng;
 
 pub mod facility;
 pub mod resources;

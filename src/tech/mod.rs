@@ -123,21 +123,48 @@ impl TechDiGraph {
 
     None
   }
-/*
+
   pub fn mark_studied(&mut self, tech: Tech) -> Result<(), String> {
-    let mut node_ref = Self::get_node_ref_mut(&mut self.prereqs, tech);
-    if node_ref.is_none() {
-      node_ref = Self::get_node_ref_mut(&mut self.advanced, tech);
-    }
-    if node_ref.is_none() {
-      return Err("Tech not found".to_string() );
-    }
-
-    node_ref = node_ref.unwrap();
-
-    node_ref.mark_researched()
+    let (prereqs, advanced) = (&mut self.prereqs, &mut self.advanced);
+    Self::get_node_ref_mut(prereqs, tech).
+    or_else(move || Self::get_node_ref_mut(advanced, tech) ).
+    ok_or("mark_studied(): Tech not found".to_string() )?.
+    mark_researched()
   }
-*/
+
+  pub fn show_graph(&self) {
+
+  }
+
+  pub fn show_local_graph(&self, tech: Tech) -> Result<(), String> {
+    let tech_ref = {
+      Self::get_node_ref(&self.prereqs, tech).
+      or_else(|| Self::get_node_ref(&self.advanced, tech) ).
+      ok_or("show_local_graph(): Tech not found".to_string() )?
+      as *const TechNode
+    };
+
+    let mut to_search = Vec::new();
+    unsafe {
+      println!("{:?}", (*tech_ref).get_tech_name() );
+    }
+    to_search.push(tech_ref);
+
+    while !to_search.is_empty() {
+      let next = to_search.remove(0);
+
+      unsafe {
+        if let Some(ie_vec) = (*next).get_all_in_edges() {
+          let mut layer = "".to_string();
+          for t in ie_vec {
+            layer = layer + "  " + &*String::from((*t).get_tech_name() );
+          }
+        }
+      }
+    }
+
+    Ok(() )
+  }
 }
 
 pub struct TechState {

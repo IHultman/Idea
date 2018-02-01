@@ -6,6 +6,7 @@ use super::technode::*;
 #[test]
 fn tech_digraph_test_1() {
 //testing add_prereq()
+
   let mut digraph = TechDiGraph::new();
 
   assert!(digraph.prereqs.is_empty() );
@@ -22,6 +23,7 @@ fn tech_digraph_test_1() {
 #[should_panic]
 fn tech_digraph_test_2() {
 //testing add_prereq()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Flight).unwrap();
@@ -32,6 +34,7 @@ fn tech_digraph_test_2() {
 #[should_panic]
 fn tech_digraph_test_3() {
 //testing add_prereq()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.advanced.push(TechNode::new(Tech::Flight) );
@@ -41,6 +44,7 @@ fn tech_digraph_test_3() {
 #[test]
 fn tech_digraph_test_4() {
 //testing get_node_ref()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.prereqs.push(TechNode::new(Tech::Antimatter) );
@@ -54,6 +58,7 @@ fn tech_digraph_test_4() {
 #[should_panic]
 fn tech_digraph_test_5() {
 //testing get_node_ref()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.prereqs.push(TechNode::new(Tech::Antimatter) );
@@ -64,6 +69,7 @@ fn tech_digraph_test_5() {
 #[should_panic]
 fn tech_digraph_test_6() {
 //testing get_node_ref()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.advanced.push(TechNode::new(Tech::Flight) );
@@ -73,6 +79,7 @@ fn tech_digraph_test_6() {
 #[test]
 fn tech_digraph_test_7() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -85,6 +92,7 @@ fn tech_digraph_test_7() {
 #[test]
 fn tech_digraph_test_8() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -99,6 +107,7 @@ fn tech_digraph_test_8() {
 #[test]
 fn tech_digraph_test_9() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -115,6 +124,7 @@ fn tech_digraph_test_9() {
 #[should_panic]
 fn tech_digraph_test_10() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -126,6 +136,7 @@ fn tech_digraph_test_10() {
 #[should_panic]
 fn tech_digraph_test_11() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -136,6 +147,7 @@ fn tech_digraph_test_11() {
 #[test]
 fn tech_digraph_test_12() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -154,6 +166,7 @@ fn tech_digraph_test_12() {
 #[should_panic]
 fn tech_digraph_test_13() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
   digraph.add_prereq(Tech::Antimatter).unwrap();
@@ -162,9 +175,70 @@ fn tech_digraph_test_13() {
 }
 
 #[test]
+#[should_panic]
 fn tech_digraph_test_14() {
 //testing add_advanced_link()
+
   let mut digraph = TechDiGraph::new();
 
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::EnergyShield, Tech::Earthquake).unwrap();
+}
 
+#[test]
+fn tech_digraph_test_15() {
+//testing mark_studied()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.mark_studied(Tech::Flight).unwrap();
+}
+
+#[test]
+fn tech_digraph_test_16() {
+//testing mark_studied()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::Flight, Tech::EnergyShield);
+  digraph.mark_studied(Tech::Flight).unwrap();
+}
+
+#[test]
+#[should_panic]
+fn tech_digraph_test_17() {
+//testing mark_studied()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::Flight, Tech::EnergyShield);
+  digraph.mark_studied(Tech::EnergyShield).unwrap();
+}
+
+#[test]
+fn tech_digraph_test_18() {
+//testing mark_studied()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::Flight, Tech::EnergyShield);
+  digraph.mark_studied(Tech::Flight).unwrap();
+  digraph.mark_studied(Tech::EnergyShield).unwrap();
+}
+
+#[test]
+#[should_panic]
+fn tech_digraph_test_19() {
+//testing mark_studied()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::Flight, Tech::EnergyShield);
+  digraph.mark_studied(Tech::Flight).unwrap();
+  digraph.mark_studied(Tech::Flight).unwrap();
 }

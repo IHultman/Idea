@@ -5,4 +5,5 @@ authors = ["Ian Hultman <Ian-Hultman@uiowa.edu>"]
 
 [dependencies]
 
+colored = "1.6.0"
 rand = "0.3.16"
