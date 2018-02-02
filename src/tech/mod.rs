@@ -144,23 +144,26 @@ impl TechDiGraph {
       as *const TechNode
     };
 
-    let mut to_search = Vec::new();
-    unsafe {
-      println!("{:?}", (*tech_ref).get_tech_name() );
-    }
-    to_search.push(tech_ref);
+    let mut top_layer = Vec::new();
+    top_layer.push(tech_ref);
 
-    while !to_search.is_empty() {
-      let next = to_search.remove(0);
+    while !top_layer.is_empty() {
+      let mut layer_str = "".to_string();
+      let mut next_layer = Vec::new();
 
-      unsafe {
-        if let Some(ie_vec) = (*next).get_all_in_edges() {
-          let mut layer = "".to_string();
-          for t in ie_vec {
-            layer = layer + "  " + &*String::from((*t).get_tech_name() );
+      for next in top_layer {
+        unsafe {
+          layer_str = layer_str + &*String::from((*next).get_tech_name() ) + "  ";
+          if let Some(ie_vec) = (*next).get_all_in_edges() {
+            for t in ie_vec {
+              next_layer.push(t);
+            }
           }
         }
       }
+
+      println!("{}", layer_str);
+      top_layer = next_layer;
     }
 
     Ok(() )
