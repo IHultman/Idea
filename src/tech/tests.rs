@@ -242,3 +242,41 @@ fn tech_digraph_test_19() {
   digraph.mark_studied(Tech::Flight).unwrap();
   digraph.mark_studied(Tech::Flight).unwrap();
 }
+
+#[test]
+fn tech_digraph_test_20() {
+//testing show_local_graph()
+
+  let mut digraph = TechDiGraph::new();
+
+  digraph.add_prereq(Tech::T1).unwrap();
+  digraph.add_prereq(Tech::T2).unwrap();
+  digraph.add_prereq(Tech::T3).unwrap();
+  digraph.add_prereq(Tech::T4).unwrap();
+  digraph.add_prereq(Tech::T5).unwrap();
+
+  digraph.add_advanced_link(Tech::T1, Tech::Flight).unwrap();
+  digraph.add_advanced_link(Tech::T2, Tech::Flight).unwrap();
+
+  digraph.add_advanced_link(Tech::T1, Tech::Walls).unwrap();
+  digraph.add_advanced_link(Tech::T3, Tech::Walls).unwrap();
+
+  digraph.add_advanced_link(Tech::T2, Tech::Earthquake).unwrap();
+  digraph.add_advanced_link(Tech::T4, Tech::Earthquake).unwrap();
+
+  digraph.add_advanced_link(Tech::T4, Tech::EnergyShield).unwrap();
+
+  digraph.add_advanced_link(Tech::T1, Tech::WeatherControl).unwrap();
+  digraph.add_advanced_link(Tech::T2, Tech::WeatherControl).unwrap();
+  digraph.add_advanced_link(Tech::T3, Tech::WeatherControl).unwrap();
+  digraph.add_advanced_link(Tech::T4, Tech::WeatherControl).unwrap();
+
+  digraph.add_advanced_link(Tech::T5, Tech::Antimatter).unwrap();
+  digraph.add_advanced_link(Tech::Walls, Tech::Antimatter).unwrap();
+  digraph.add_advanced_link(Tech::Flight, Tech::Antimatter).unwrap();
+  digraph.add_advanced_link(Tech::WeatherControl, Tech::Antimatter).unwrap();
+
+  digraph.show_local_graph(Tech::Antimatter).unwrap();
+
+  panic!()
+}

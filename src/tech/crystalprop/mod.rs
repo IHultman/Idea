@@ -30,6 +30,16 @@ pub enum Tech {
   Walls,
   WarningSystem,
   WeatherControl,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8,
+  T9,
+  T10,
 }
 
 impl PartialEq<Tech> for Tech {
@@ -43,6 +53,16 @@ impl PartialEq<Tech> for Tech {
       Tech::Walls          => if let Tech::Walls = (*other) {true} else {false},
       Tech::WarningSystem  => if let Tech::WarningSystem = (*other) {true} else {false},
       Tech::WeatherControl => if let Tech::WeatherControl = (*other) {true} else {false},
+      Tech::T1             => if let Tech::T1 = (*other) {true} else {false},
+      Tech::T2             => if let Tech::T2 = (*other) {true} else {false},
+      Tech::T3             => if let Tech::T3 = (*other) {true} else {false},
+      Tech::T4             => if let Tech::T4 = (*other) {true} else {false},
+      Tech::T5             => if let Tech::T5 = (*other) {true} else {false},
+      Tech::T6             => if let Tech::T6 = (*other) {true} else {false},
+      Tech::T7             => if let Tech::T7 = (*other) {true} else {false},
+      Tech::T8             => if let Tech::T8 = (*other) {true} else {false},
+      Tech::T9             => if let Tech::T9 = (*other) {true} else {false},
+      Tech::T10            => if let Tech::T10 = (*other) {true} else {false},
     }
   }
 }
@@ -58,6 +78,16 @@ impl From<Tech> for String {
       Tech::Walls          => "Walls".to_string(),
       Tech::WarningSystem  => "WarningSystem".to_string(),
       Tech::WeatherControl => "WeatherControl".to_string(),
+      Tech::T1             => "T1".to_string(),
+      Tech::T2             => "T2".to_string(),
+      Tech::T3             => "T3".to_string(),
+      Tech::T4             => "T4".to_string(),
+      Tech::T5             => "T5".to_string(),
+      Tech::T6             => "T6".to_string(),
+      Tech::T7             => "T7".to_string(),
+      Tech::T8             => "T8".to_string(),
+      Tech::T9             => "T9".to_string(),
+      Tech::T10            => "T10".to_string(),
     }
   }
 }

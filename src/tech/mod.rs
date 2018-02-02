@@ -144,12 +144,12 @@ impl TechDiGraph {
       as *const TechNode
     };
 
-    let mut top_layer = Vec::new();
+    let mut top_layer: Vec<*const TechNode> = Vec::new();
     top_layer.push(tech_ref);
 
     while !top_layer.is_empty() {
       let mut layer_str = "".to_string();
-      let mut next_layer = Vec::new();
+      let mut next_layer: Vec<*const TechNode> = Vec::new();
 
       for next in top_layer {
         unsafe {
