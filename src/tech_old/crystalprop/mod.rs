@@ -1,5 +1,8 @@
 use std::convert::From;
 use std::ops::{Index, IndexMut};
+use std::sync::{Arc, Mutex, Weak};
+
+type Ptr<T> = Arc<Mutex<T> >;
 
 
 pub enum CrystalProperty {
