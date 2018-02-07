@@ -3,6 +3,7 @@ use self::technode::*;
 
 
 pub mod crystalprop;
+mod techidx;
 mod technode;
 
 
