@@ -16,7 +16,6 @@ pub struct TechDiGraph {
 }
 
 pub enum TechDiGraphErrs {
-  //
   A,
 }
 
@@ -38,7 +37,7 @@ impl TechDiGraph {
     Ok(() )
   }
 
-  pub fn add_advanced_link(&mut self) -> Result<(), TechDiGraphErrs> {
+  pub fn add_advanced_link(&mut self, from_t: Tech, to_t: Tech) -> Result<(), TechDiGraphErrs> {
 
     Ok(() )
   }

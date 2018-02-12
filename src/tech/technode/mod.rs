@@ -18,6 +18,7 @@ pub enum TechNodeErrs {
   AttemptToLinkToSelf,
   IllegallyMarkedAvailable,
   InEdgesTechAlreadyExists,
+  OtherEvent,
   OutEdgesTechAlreadyExists,
   TechAlreadyMarkedAcquired,
   TechNotAvailable,
@@ -28,7 +29,7 @@ impl TechNode {
   pub fn new(tech: Tech, is_prereq: bool) -> TechNode {
     TechNode {
       tech_name: tech,
-      available: is_prereq,
+      available: true,
       is_prereq: is_prereq,
       researched: false,
       acquired_in_edges: None,
@@ -53,6 +54,7 @@ impl TechNode {
     }
 
     let ui_edges: &mut Vec<Tech> = self.unacquired_in_edges.get_or_insert(Vec::with_capacity(5) );
+    self.available = false;
     ui_edges.binary_search(&tech).
     map(|_| true).
     or_else(|i| {
@@ -66,7 +68,7 @@ impl TechNode {
     if self.tech_name == tech {
       return Err(TechNodeErrs::AttemptToLinkToSelf);
     }
-    
+
     let o_edges: &mut Vec<Tech> = self.out_edges.get_or_insert(Vec::with_capacity(5) );
     o_edges.binary_search(&tech).
     map(|_| true).
@@ -87,6 +89,7 @@ impl TechNode {
       let mut v = rv.clone();
       self.get_unacquired_in_edges().
       map(|rv| v.extend_from_slice(rv) );
+      v.sort();
       v
     }).
     or_else(||
@@ -110,7 +113,11 @@ impl TechNode {
   pub fn mark_researched(&mut self) -> Result<(), TechNodeErrs> {
     if self.available {
       if self.unacquired_in_edges.is_some() {
-        self.available = false;
+        let v = self.unacquired_in_edges.take().ok_or(TechNodeErrs::OtherEvent)?;
+        if !v.is_empty() {
+          self.available = false;
+          self.unacquired_in_edges = Some(v);
+        }
         return Err(TechNodeErrs::IllegallyMarkedAvailable);
       }
 
@@ -138,7 +145,7 @@ impl TechNode {
       })
     ).
     map(|(t, p)| {
-      if p {self.unacquired_in_edges = None;} Ok(t)
+      if p {self.unacquired_in_edges = None; self.available = true;} Ok(t)
     }).
     or_else(|e|
       self.get_acquired_in_edges().
