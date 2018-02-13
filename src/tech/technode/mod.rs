@@ -13,16 +13,16 @@ pub struct TechNode {
 
 #[derive(Clone, Copy, Debug)]
 pub enum TechNodeErrs {
-  AlreadyResearched,
-  AttemptToLinkToPrereq,
-  AttemptToLinkToSelf,
-  IllegallyMarkedAvailable,
-  InEdgesTechAlreadyExists,
-  OtherEvent,
-  OutEdgesTechAlreadyExists,
-  TechAlreadyMarkedAcquired,
-  TechNotAvailable,
-  TechNotFound,
+  AttemptToLinkToPrereq(Tech, Tech),
+  AttemptToLinkToSelf(Tech),
+  IllegallyMarkedAvailable(Tech),
+  InEdgesTechAlreadyExists(Tech, Tech),
+  LinkAlreadyAcquired(Tech, Tech),
+  OtherEvent(Tech),
+  OutEdgesTechAlreadyExists(Tech, Tech),
+  TechAlreadyResearched(Tech),
+  TechNotAvailable(Tech),
+  TechNotFound(Tech),
 }
 
 impl TechNode {
@@ -39,17 +39,18 @@ impl TechNode {
   }
 
   pub fn add_in_edge(&mut self, tech: Tech) -> Result<(), TechNodeErrs> {
-    if self.is_prereq {
-      return Err(TechNodeErrs::AttemptToLinkToPrereq);
+    let t_name = self.get_tech_name();
+    if self.tech_name == tech {
+      return Err(TechNodeErrs::AttemptToLinkToSelf(tech) );
     }
 
-    if self.tech_name == tech {
-      return Err(TechNodeErrs::AttemptToLinkToSelf);
+    if self.is_prereq {
+      return Err(TechNodeErrs::AttemptToLinkToPrereq(tech, t_name) );
     }
 
     if let Some(ref ai_edges) = self.acquired_in_edges {
       if ai_edges.binary_search(&tech).is_ok() {
-        return Err(TechNodeErrs::InEdgesTechAlreadyExists);
+        return Err(TechNodeErrs::InEdgesTechAlreadyExists(tech, t_name) );
       }
     }
 
@@ -61,12 +62,18 @@ impl TechNode {
       ui_edges.insert(i, tech);
       Ok(false)
     }).
-    and_then(|p| if p {Err(TechNodeErrs::InEdgesTechAlreadyExists)} else {Ok(() )})  // Result<(), TechNodeErrs>
+    and_then(|p|
+      if p {
+        Err(TechNodeErrs::InEdgesTechAlreadyExists(tech, t_name) )
+      } else {
+        Ok(() )
+    })
   }
 
   pub fn add_out_edge(&mut self, tech: Tech) -> Result<(), TechNodeErrs> {
-    if self.tech_name == tech {
-      return Err(TechNodeErrs::AttemptToLinkToSelf);
+    let t_name = self.get_tech_name();
+    if t_name == tech {
+      return Err(TechNodeErrs::AttemptToLinkToSelf(tech) );
     }
 
     let o_edges: &mut Vec<Tech> = self.out_edges.get_or_insert(Vec::with_capacity(5) );
@@ -76,7 +83,12 @@ impl TechNode {
       o_edges.insert(i, tech);
       Ok(false)
     }).
-    and_then(|p| if p {Err(TechNodeErrs::OutEdgesTechAlreadyExists)} else {Ok(() )})
+    and_then(|p|
+      if p {
+        Err(TechNodeErrs::OutEdgesTechAlreadyExists(t_name, tech) )
+      } else {
+        Ok(() )
+    })
   }
 
   pub fn get_acquired_in_edges(&self) -> Option<&Vec<Tech> > {
@@ -113,32 +125,33 @@ impl TechNode {
   pub fn mark_researched(&mut self) -> Result<(), TechNodeErrs> {
     if self.available {
       if self.unacquired_in_edges.is_some() {
-        let v = self.unacquired_in_edges.take().ok_or(TechNodeErrs::OtherEvent)?;
+        let v = self.unacquired_in_edges.take().ok_or(TechNodeErrs::OtherEvent(self.get_tech_name()) )?;
         if !v.is_empty() {
           self.available = false;
           self.unacquired_in_edges = Some(v);
         }
-        return Err(TechNodeErrs::IllegallyMarkedAvailable);
+        return Err(TechNodeErrs::IllegallyMarkedAvailable(self.get_tech_name()) );
       }
 
       if !self.researched {
         self.researched = true;
       } else {
-        return Err(TechNodeErrs::AlreadyResearched);
+        return Err(TechNodeErrs::TechAlreadyResearched(self.get_tech_name()) );
       }
     } else {
-      return Err(TechNodeErrs::TechNotAvailable)
+      return Err(TechNodeErrs::TechNotAvailable(self.get_tech_name()) )
     }
 
     Ok(() )
   }
 
   pub fn move_link_acquired(&mut self, tech: Tech) -> Result<(), TechNodeErrs> {
+    let t_name = self.get_tech_name();
     self.unacquired_in_edges.as_mut().
-    ok_or(TechNodeErrs::TechNotFound).
+    ok_or(TechNodeErrs::TechNotFound(tech) ).
     and_then(|rmv|
       rmv.binary_search(&tech).
-      or(Err(TechNodeErrs::TechNotFound) ).
+      or(Err(TechNodeErrs::TechNotFound(tech) ) ).
       map(|i| {
         let t = rmv.remove(i);
         (t, rmv.is_empty() )
@@ -153,7 +166,7 @@ impl TechNode {
       and_then(|rv|
         rv.binary_search(&tech).
         or(Err(e) ).
-        and(Err(TechNodeErrs::TechAlreadyMarkedAcquired) )
+        and(Err(TechNodeErrs::LinkAlreadyAcquired(tech, t_name)) )
       )
     )?.
     and_then(|t| {
@@ -164,7 +177,12 @@ impl TechNode {
         rmv.insert(i, t);
         Ok(false)
       }).
-      and_then(|p| if !p {Ok(() )} else {Err(TechNodeErrs::TechAlreadyMarkedAcquired)} )
+      and_then(|p|
+        if !p {
+          Ok(() )
+        } else {
+          Err(TechNodeErrs::LinkAlreadyAcquired(tech, t_name) )
+      })
     })
   }
 }

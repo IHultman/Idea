@@ -1,6 +1,7 @@
 use self::crystalprop::{CrystalProperties, CrystalProperty, Tech};
 use self::technode::*;
 
+use std::convert::From;
 use std::ops::{Index, IndexMut};
 
 
@@ -15,8 +16,33 @@ pub struct TechDiGraph {
   tech_list: Vec<Option<TechNode> >,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub enum TechDiGraphErrs {
-  A,
+  IllegalLink(Tech, Tech),
+  LinkToTechAlreadyAcquired(Tech, Tech),
+  LinkToTechAlreadyInsertedToGraph(Tech, Tech),
+  OtherEvent(Tech),
+  PrereqAlreadyInsertedToGraph(Tech),
+  TechAlreadyResearched(Tech),
+  TechNotAvailable(Tech),
+  TechNotFound(Tech),
+}
+
+impl From<TechNodeErrs> for TechDiGraphErrs {
+  fn from(e: TechNodeErrs) -> Self {
+    match e {
+      TechNodeErrs::AttemptToLinkToPrereq(t1, t2)     => TechDiGraphErrs::IllegalLink(t1, t2),
+      TechNodeErrs::AttemptToLinkToSelf(t)            => TechDiGraphErrs::IllegalLink(t, t),
+      TechNodeErrs::IllegallyMarkedAvailable(t)       => TechDiGraphErrs::TechNotAvailable(t),
+      TechNodeErrs::InEdgesTechAlreadyExists(t1, t2)  => TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(t1, t2),
+      TechNodeErrs::LinkAlreadyAcquired(t1, t2)       => TechDiGraphErrs::LinkToTechAlreadyAcquired(t1, t2),
+      TechNodeErrs::OtherEvent(t)                     => TechDiGraphErrs::OtherEvent(t),
+      TechNodeErrs::OutEdgesTechAlreadyExists(t1, t2) => TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(t1, t2),
+      TechNodeErrs::TechAlreadyResearched(t)          => TechDiGraphErrs::TechAlreadyResearched(t),
+      TechNodeErrs::TechNotAvailable(t)               => TechDiGraphErrs::TechNotAvailable(t),
+      TechNodeErrs::TechNotFound(t)                   => TechDiGraphErrs::TechNotFound(t),
+    }
+  }
 }
 
 impl TechDiGraph {
@@ -33,13 +59,37 @@ impl TechDiGraph {
   }
 
   pub fn add_prereq(&mut self, tech: Tech) -> Result<(), TechDiGraphErrs> {
+    if self[tech].is_none() {
+      self[tech] = Some(TechNode::new(tech, true) );
+    } else {
+      return Err(TechDiGraphErrs::PrereqAlreadyInsertedToGraph(tech) );
+    }
 
     Ok(() )
   }
 
   pub fn add_advanced_link(&mut self, from_t: Tech, to_t: Tech) -> Result<(), TechDiGraphErrs> {
+    self[from_t].as_mut().
+      ok_or(TechDiGraphErrs::TechNotFound(from_t) ).
+      and_then(|tn_rm|
+        tn_rm.add_out_edge(to_t).
+        map_err(|e| TechDiGraphErrs::from(e))
+      ).
+      or_else(|e| if let TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(..) = e {Ok(() )} else {Err(e)})?;
 
-    Ok(() )
+    self[to_t].get_or_insert(TechNode::new(to_t, false) ).
+      add_in_edge(from_t).
+      map_err(|e| TechDiGraphErrs::from(e) )
+  }
+
+  pub fn get_node_ref(&self, tech: Tech) -> Option<&TechNode> {
+
+    None
+  }
+
+  pub fn get_node_mut(&mut self, tech: Tech) -> Option<&mut TechNode> {
+
+    None
   }
 }
 
