@@ -16,11 +16,13 @@ pub struct TechDiGraph {
   tech_list: Vec<Option<TechNode> >,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum TechDiGraphErrs {
   IllegalLink(Tech, Tech),
   LinkToTechAlreadyAcquired(Tech, Tech),
   LinkToTechAlreadyInsertedToGraph(Tech, Tech),
+  LinkToTechNotFound(Tech, Tech),
+  MultipleErrs(Vec<TechDiGraphErrs>),
   OtherEvent(Tech),
   PrereqAlreadyInsertedToGraph(Tech),
   TechAlreadyResearched(Tech),
@@ -36,11 +38,11 @@ impl From<TechNodeErrs> for TechDiGraphErrs {
       TechNodeErrs::IllegallyMarkedAvailable(t)       => TechDiGraphErrs::TechNotAvailable(t),
       TechNodeErrs::InEdgesTechAlreadyExists(t1, t2)  => TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(t1, t2),
       TechNodeErrs::LinkAlreadyAcquired(t1, t2)       => TechDiGraphErrs::LinkToTechAlreadyAcquired(t1, t2),
+      TechNodeErrs::LinkToTechNotFound(t1, t2)        => TechDiGraphErrs::LinkToTechNotFound(t1, t2),
       TechNodeErrs::OtherEvent(t)                     => TechDiGraphErrs::OtherEvent(t),
       TechNodeErrs::OutEdgesTechAlreadyExists(t1, t2) => TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(t1, t2),
       TechNodeErrs::TechAlreadyResearched(t)          => TechDiGraphErrs::TechAlreadyResearched(t),
       TechNodeErrs::TechNotAvailable(t)               => TechDiGraphErrs::TechNotAvailable(t),
-      TechNodeErrs::TechNotFound(t)                   => TechDiGraphErrs::TechNotFound(t),
     }
   }
 }
@@ -70,26 +72,60 @@ impl TechDiGraph {
 
   pub fn add_advanced_link(&mut self, from_t: Tech, to_t: Tech) -> Result<(), TechDiGraphErrs> {
     self[from_t].as_mut().
-      ok_or(TechDiGraphErrs::TechNotFound(from_t) ).
-      and_then(|tn_rm|
-        tn_rm.add_out_edge(to_t).
-        map_err(|e| TechDiGraphErrs::from(e))
-      ).
-      or_else(|e| if let TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(..) = e {Ok(() )} else {Err(e)})?;
+    ok_or(TechDiGraphErrs::TechNotFound(from_t) ).
+    and_then(|tn_rm|
+      tn_rm.add_out_edge(to_t).
+      map_err(|e| TechDiGraphErrs::from(e) )
+    ).
+    or_else(|e| if let TechDiGraphErrs::LinkToTechAlreadyInsertedToGraph(..) = e {Ok(() )} else {Err(e)})?;
 
     self[to_t].get_or_insert(TechNode::new(to_t, false) ).
-      add_in_edge(from_t).
-      map_err(|e| TechDiGraphErrs::from(e) )
+    add_in_edge(from_t).
+    map_err(|e| TechDiGraphErrs::from(e) )
   }
 
-  pub fn get_node_ref(&self, tech: Tech) -> Option<&TechNode> {
+  pub fn mark_researched(&mut self, tech: Tech) -> Result<(), TechDiGraphErrs> {
+    self[tech].as_mut().
+    ok_or(TechDiGraphErrs::TechNotFound(tech) ).
+    and_then(|tn_rm| {
+      tn_rm.mark_researched().
+      or_else(|e|
+        if let TechNodeErrs::IllegallyMarkedAvailable(_) = e {
+          tn_rm.mark_researched().map_err(|e| TechDiGraphErrs::from(e) )
+        } else {
+          Err(TechDiGraphErrs::from(e) )
+        }
+      ).
+      or_else(|e| if let TechDiGraphErrs::TechAlreadyResearched(_) = e {Ok(() )} else {Err(e)})?;
+      if let Some(rv) = tn_rm.get_out_edges() {
+        Ok(Some(rv.clone()) )
+      } else {
+        Ok(None)
+      }
+    }).
+    and_then(|tn_out| {
+      let mut errs = Vec::new();
+      if let Some(v) = tn_out {
+        for t in v {
+          self[t].as_mut().
+          ok_or_else(|| {
+            errs.push(TechDiGraphErrs::TechNotFound(t) );
+          }).
+          and_then(|tn_rm|
+            tn_rm.move_link_acquired(tech).
+            map_err(|e| {
+              errs.push(TechDiGraphErrs::from(e) );
+            })
+          );
+        }
+      }
 
-    None
-  }
-
-  pub fn get_node_mut(&mut self, tech: Tech) -> Option<&mut TechNode> {
-
-    None
+      if errs.is_empty() {
+        Ok(() )
+      } else {
+        Err(TechDiGraphErrs::MultipleErrs(errs) )
+      }
+    })
   }
 }
 

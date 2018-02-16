@@ -22,7 +22,7 @@ pub enum TechNodeErrs {
   OutEdgesTechAlreadyExists(Tech, Tech),
   TechAlreadyResearched(Tech),
   TechNotAvailable(Tech),
-  TechNotFound(Tech),
+  LinkToTechNotFound(Tech, Tech),
 }
 
 impl TechNode {
@@ -123,23 +123,25 @@ impl TechNode {
   }
 
   pub fn mark_researched(&mut self) -> Result<(), TechNodeErrs> {
+    let t_name = self.get_tech_name();
     if self.available {
       if self.unacquired_in_edges.is_some() {
-        let v = self.unacquired_in_edges.take().ok_or(TechNodeErrs::OtherEvent(self.get_tech_name()) )?;
+        let v = self.unacquired_in_edges.take().
+          ok_or(TechNodeErrs::OtherEvent(t_name) )?;
         if !v.is_empty() {
           self.available = false;
           self.unacquired_in_edges = Some(v);
         }
-        return Err(TechNodeErrs::IllegallyMarkedAvailable(self.get_tech_name()) );
+        return Err(TechNodeErrs::IllegallyMarkedAvailable(t_name) );
       }
 
       if !self.researched {
         self.researched = true;
       } else {
-        return Err(TechNodeErrs::TechAlreadyResearched(self.get_tech_name()) );
+        return Err(TechNodeErrs::TechAlreadyResearched(t_name) );
       }
     } else {
-      return Err(TechNodeErrs::TechNotAvailable(self.get_tech_name()) )
+      return Err(TechNodeErrs::TechNotAvailable(t_name) )
     }
 
     Ok(() )
@@ -148,10 +150,10 @@ impl TechNode {
   pub fn move_link_acquired(&mut self, tech: Tech) -> Result<(), TechNodeErrs> {
     let t_name = self.get_tech_name();
     self.unacquired_in_edges.as_mut().
-    ok_or(TechNodeErrs::TechNotFound(tech) ).
+    ok_or(TechNodeErrs::LinkToTechNotFound(tech, t_name) ).
     and_then(|rmv|
       rmv.binary_search(&tech).
-      or(Err(TechNodeErrs::TechNotFound(tech) ) ).
+      or(Err(TechNodeErrs::LinkToTechNotFound(tech, t_name) ) ).
       map(|i| {
         let t = rmv.remove(i);
         (t, rmv.is_empty() )
