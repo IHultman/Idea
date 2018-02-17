@@ -173,9 +173,75 @@ fn techdigraph_test_10() {
 
 #[test]
 fn techdigraph_test_11() {
-//
+// tests mark_researched()
+  let mut techdigraph = TechDiGraph::new();
+
+  assert!(techdigraph[Tech::T1].is_none() );
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+  assert!(!techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+  assert!(techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+}
+
+#[test]
+#[should_panic]
+fn techdigraph_test_12() {
+// fails with TechDiGraphErrs::TechNotFound
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+}
+
+#[test]
+fn techdigraph_test_13() {
+// tests mark_researched()
   let mut techdigraph = TechDiGraph::new();
 
   techdigraph.add_prereq(Tech::T1).unwrap();
   techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
+
+  assert!(!techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+  assert!(!techdigraph[Tech::T2].as_ref().unwrap().is_researched() );
+
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2]);
+  assert_eq!(
+    &**techdigraph[Tech::T2].as_ref().
+    unwrap().
+    get_unacquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+
+  assert!(techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+  assert!(!techdigraph[Tech::T2].as_ref().unwrap().is_researched() );
+
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2]);
+  assert_eq!(
+    &**techdigraph[Tech::T2].as_ref().
+    unwrap().
+    get_acquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
+  assert!(techdigraph[Tech::T2].as_ref().unwrap().get_unacquired_in_edges().is_none() );
+}
+
+#[test]
+fn techdigraph_test_14() {
+//
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+  techdigraph.mark_researched(Tech::T1).unwrap();
 }

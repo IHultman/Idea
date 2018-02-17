@@ -122,6 +122,10 @@ impl TechNode {
     self.unacquired_in_edges.as_ref()
   }
 
+  pub fn is_researched(&self) -> bool {
+    self.researched
+  }
+
   pub fn mark_researched(&mut self) -> Result<(), TechNodeErrs> {
     let t_name = self.get_tech_name();
     if self.available {
