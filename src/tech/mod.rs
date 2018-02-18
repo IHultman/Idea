@@ -88,7 +88,7 @@ impl TechDiGraph {
     self[tech].as_mut().
     ok_or(TechDiGraphErrs::TechNotFound(tech) ).
     and_then(|tn_rm| {
-      tn_rm.mark_researched().
+      let is_ar = tn_rm.mark_researched().
       or_else(|e|
         if let TechNodeErrs::IllegallyMarkedAvailable(_) = e {
           tn_rm.mark_researched().map_err(|e| TechDiGraphErrs::from(e) )
@@ -96,14 +96,15 @@ impl TechDiGraph {
           Err(TechDiGraphErrs::from(e) )
         }
       ).
-      or_else(|e| if let TechDiGraphErrs::TechAlreadyResearched(_) = e {Ok(() )} else {Err(e)})?;
+      map(|_| false).
+      or_else(|e| if let TechDiGraphErrs::TechAlreadyResearched(_) = e {Ok(true)} else {Err(e)})?;
       if let Some(rv) = tn_rm.get_out_edges() {
-        Ok(Some(rv.clone()) )
+        Ok((Some(rv.clone() ), is_ar) )
       } else {
-        Ok(None)
+        Ok((None, is_ar) )
       }
     }).
-    and_then(|tn_out| {
+    and_then(|(tn_out, is_ar)| {
       let mut errs = Vec::new();
       if let Some(v) = tn_out {
         for t in v {
@@ -121,8 +122,15 @@ impl TechDiGraph {
       }
 
       if errs.is_empty() {
-        Ok(() )
+        if is_ar {
+          Err(TechDiGraphErrs::TechAlreadyResearched(tech) )
+        } else {
+          Ok(() )
+        }
       } else {
+        if is_ar {
+          errs.insert(0, TechDiGraphErrs::TechAlreadyResearched(tech) );
+        }
         Err(TechDiGraphErrs::MultipleErrs(errs) )
       }
     })

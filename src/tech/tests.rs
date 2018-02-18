@@ -236,12 +236,42 @@ fn techdigraph_test_13() {
 }
 
 #[test]
+#[should_panic]
 fn techdigraph_test_14() {
-//
+// fails with TechDiGraphErrs::TechAlreadyResearched
   let mut techdigraph = TechDiGraph::new();
 
   techdigraph.add_prereq(Tech::T1).unwrap();
 
   techdigraph.mark_researched(Tech::T1).unwrap();
+  techdigraph.mark_researched(Tech::T1).unwrap();
+}
+
+#[test]
+#[should_panic]
+fn techdigraph_test_15() {
+// fails with TechDiGraphErrs::MultipleErrs([TechAlreadyResearched, LinkToTechAlreadyAcquired])
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+  techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+  techdigraph.mark_researched(Tech::T1).unwrap();
+}
+
+#[test]
+//#[should_panic]
+fn techdigraph_test_16() {
+// fails with TechDiGraphErrs::MultipleErrs([TechAlreadyResearched, LinkToTechAlreadyAcquired])
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+  techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+
+  techdigraph.add_advanced_link(Tech::T1, Tech::T3).unwrap();
+  
   techdigraph.mark_researched(Tech::T1).unwrap();
 }
