@@ -261,17 +261,70 @@ fn techdigraph_test_15() {
 }
 
 #[test]
-//#[should_panic]
 fn techdigraph_test_16() {
-// fails with TechDiGraphErrs::MultipleErrs([TechAlreadyResearched, LinkToTechAlreadyAcquired])
+// tests mark_researched()
   let mut techdigraph = TechDiGraph::new();
 
   techdigraph.add_prereq(Tech::T1).unwrap();
   techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
 
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2]);
+  assert_eq!(
+    &**techdigraph[Tech::T2].as_ref().
+    unwrap().
+    get_unacquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
   techdigraph.mark_researched(Tech::T1).unwrap();
 
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2]);
+  assert_eq!(
+    &**techdigraph[Tech::T2].as_ref().
+    unwrap().
+    get_acquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
   techdigraph.add_advanced_link(Tech::T1, Tech::T3).unwrap();
+
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2, Tech::T3]);
+  assert_eq!(
+    &**techdigraph[Tech::T3].as_ref().
+    unwrap().
+    get_unacquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
+  // returns Err(TechDiGraphErrs::MultipleErrs([TechAlreadyResearched, LinkToTechAlreadyAcquired]) )
+  // but also moves T1 to acquired_in_edges of T3
+  techdigraph.mark_researched(Tech::T1);
+
+  assert_eq!(
+    &**techdigraph[Tech::T1].as_ref().
+    unwrap().
+    get_out_edges().
+    unwrap(), &[Tech::T2, Tech::T3]);
+  assert_eq!(
+    &**techdigraph[Tech::T3].as_ref().
+    unwrap().
+    get_acquired_in_edges().
+    unwrap(), &[Tech::T1]);
+
+  assert!(techdigraph[Tech::T2].as_ref().unwrap().get_unacquired_in_edges().is_none() );
+  assert!(techdigraph[Tech::T3].as_ref().unwrap().get_unacquired_in_edges().is_none() );
+}
+
+#[test]
+fn techdigraph_test_17() {
   
-  techdigraph.mark_researched(Tech::T1).unwrap();
 }
