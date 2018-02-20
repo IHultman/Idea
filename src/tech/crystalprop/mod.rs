@@ -1,7 +1,9 @@
+use resources::crystals::Color;
+
 use std::convert::From;
 use std::ops::{Index, IndexMut};
 
-
+/*
 pub enum CrystalProperty {
   Anomaly, //Purple
   Combustible, //Red
@@ -16,6 +18,7 @@ pub enum CrystalProperty {
   Vegetation, //Yellow
   YellowPropertyII //Yellow
 }
+*/
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Tech {
@@ -66,17 +69,42 @@ impl From<Tech> for String {
 
 
 pub struct CrystalProperties {
-  properties: [[bool; 5]; 12]
+  properties: [[bool; 10]; 7]
 }
 
 impl CrystalProperties {
   pub fn new() -> Self {
     CrystalProperties {
-      properties: [[false; 5]; 12],
+      properties: [[false; 10]; 7],
+    }
+  }
+
+  fn get_prop_list_ref(&self, color: Color) -> &[bool; 10] {
+    match color {
+      Color::Blue   => &self.properties[0],
+      Color::Energy => &self.properties[1],
+      Color::Green  => &self.properties[2],
+      Color::Purple => &self.properties[3],
+      Color::Red    => &self.properties[4],
+      Color::Silver => &self.properties[5],
+      Color::Yellow => &self.properties[6],
+    }
+  }
+
+  fn get_prop_list_mut(&mut self, color: Color) -> &mut [bool; 10] {
+    match color {
+      Color::Blue   => &mut self.properties[0],
+      Color::Energy => &mut self.properties[1],
+      Color::Green  => &mut self.properties[2],
+      Color::Purple => &mut self.properties[3],
+      Color::Red    => &mut self.properties[4],
+      Color::Silver => &mut self.properties[5],
+      Color::Yellow => &mut self.properties[6],
     }
   }
 }
 
+/*
 impl Index<CrystalProperty> for CrystalProperties {
   type Output = [bool; 5];
 
@@ -116,7 +144,7 @@ impl IndexMut<CrystalProperty> for CrystalProperties {
     }
   }
 }
-
+*/
 
 #[cfg(test)]
 mod tests;

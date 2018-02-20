@@ -14,8 +14,8 @@ fn techdigraph_test_1() {
     assert!(t.is_none() );
   }
 
-  assert!(techdigraph[Tech::T1].is_some() );
-  assert!(techdigraph[Tech::T2].is_some() );
+  assert!(techdigraph.get_node_ref(Tech::T1).is_some() );
+  assert!(techdigraph.get_node_ref(Tech::T2).is_some() );
 
   for t in &techdigraph.tech_list[10..18] {
     assert!(t.is_none() );
@@ -41,13 +41,13 @@ fn techdigraph_test_3() {
   techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
 
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T1]);
@@ -88,19 +88,19 @@ fn techdigraph_test_6() {
   }
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
 
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T1]);
 
   assert_eq!(
-    &**techdigraph[Tech::T3].as_ref().
+    &**techdigraph.get_node_ref(Tech::T3).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T2]);
@@ -176,13 +176,13 @@ fn techdigraph_test_11() {
 // tests mark_researched()
   let mut techdigraph = TechDiGraph::new();
 
-  assert!(techdigraph[Tech::T1].is_none() );
+  assert!(techdigraph.get_node_ref(Tech::T1).is_none() );
 
   techdigraph.add_prereq(Tech::T1).unwrap();
-  assert!(!techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+  assert!(!techdigraph.get_node_ref(Tech::T1).as_ref().unwrap().is_researched() );
 
   techdigraph.mark_researched(Tech::T1).unwrap();
-  assert!(techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
+  assert!(techdigraph.get_node_ref(Tech::T1).as_ref().unwrap().is_researched() );
 }
 
 #[test]
@@ -202,37 +202,37 @@ fn techdigraph_test_13() {
   techdigraph.add_prereq(Tech::T1).unwrap();
   techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
 
-  assert!(!techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
-  assert!(!techdigraph[Tech::T2].as_ref().unwrap().is_researched() );
+  assert!(!techdigraph.get_node_ref(Tech::T1).as_ref().unwrap().is_researched() );
+  assert!(!techdigraph.get_node_ref(Tech::T2).as_ref().unwrap().is_researched() );
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T1]);
 
   techdigraph.mark_researched(Tech::T1).unwrap();
 
-  assert!(techdigraph[Tech::T1].as_ref().unwrap().is_researched() );
-  assert!(!techdigraph[Tech::T2].as_ref().unwrap().is_researched() );
+  assert!(techdigraph.get_node_ref(Tech::T1).as_ref().unwrap().is_researched() );
+  assert!(!techdigraph.get_node_ref(Tech::T2).as_ref().unwrap().is_researched() );
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_acquired_in_edges().
     unwrap(), &[Tech::T1]);
 
-  assert!(techdigraph[Tech::T2].as_ref().unwrap().get_unacquired_in_edges().is_none() );
+  assert!(techdigraph.get_node_ref(Tech::T2).as_ref().unwrap().get_unacquired_in_edges().is_none() );
 }
 
 #[test]
@@ -269,12 +269,12 @@ fn techdigraph_test_16() {
   techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T1]);
@@ -282,12 +282,12 @@ fn techdigraph_test_16() {
   techdigraph.mark_researched(Tech::T1).unwrap();
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2]);
   assert_eq!(
-    &**techdigraph[Tech::T2].as_ref().
+    &**techdigraph.get_node_ref(Tech::T2).as_ref().
     unwrap().
     get_acquired_in_edges().
     unwrap(), &[Tech::T1]);
@@ -295,12 +295,12 @@ fn techdigraph_test_16() {
   techdigraph.add_advanced_link(Tech::T1, Tech::T3).unwrap();
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2, Tech::T3]);
   assert_eq!(
-    &**techdigraph[Tech::T3].as_ref().
+    &**techdigraph.get_node_ref(Tech::T3).as_ref().
     unwrap().
     get_unacquired_in_edges().
     unwrap(), &[Tech::T1]);
@@ -310,21 +310,40 @@ fn techdigraph_test_16() {
   techdigraph.mark_researched(Tech::T1);
 
   assert_eq!(
-    &**techdigraph[Tech::T1].as_ref().
+    &**techdigraph.get_node_ref(Tech::T1).as_ref().
     unwrap().
     get_out_edges().
     unwrap(), &[Tech::T2, Tech::T3]);
   assert_eq!(
-    &**techdigraph[Tech::T3].as_ref().
+    &**techdigraph.get_node_ref(Tech::T3).as_ref().
     unwrap().
     get_acquired_in_edges().
     unwrap(), &[Tech::T1]);
 
-  assert!(techdigraph[Tech::T2].as_ref().unwrap().get_unacquired_in_edges().is_none() );
-  assert!(techdigraph[Tech::T3].as_ref().unwrap().get_unacquired_in_edges().is_none() );
+  assert!(techdigraph.get_node_ref(Tech::T2).as_ref().unwrap().get_unacquired_in_edges().is_none() );
+  assert!(techdigraph.get_node_ref(Tech::T3).as_ref().unwrap().get_unacquired_in_edges().is_none() );
 }
 
 #[test]
+#[should_panic]
 fn techdigraph_test_17() {
-  
+// fails with TechDiGraphErrs::TechNotAvailable
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+  techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
+
+  techdigraph.mark_researched(Tech::T2).unwrap();
+}
+
+#[test]
+fn techdigraph_test_18() {
+// tests mark_researched()
+  let mut techdigraph = TechDiGraph::new();
+
+  techdigraph.add_prereq(Tech::T1).unwrap();
+  techdigraph.add_advanced_link(Tech::T1, Tech::T2).unwrap();
+
+  techdigraph.mark_researched(Tech::T1).unwrap();
+  techdigraph.mark_researched(Tech::T2).unwrap();
 }
