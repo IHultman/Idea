@@ -1,5 +1,4 @@
-use super::crystalprop::*;
-
+use super::*;
 
 pub struct TechNode {
   tech_name: Tech,

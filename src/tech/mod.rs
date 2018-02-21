@@ -1,17 +1,59 @@
-use self::crystalprop::{CrystalProperties, Tech};
-use self::technode::*;
-
+use self::crystalprop::CrystalProperties;
 use std::convert::From;
-use std::ops::{Index, IndexMut};
 
 
 pub mod crystalprop;
-mod technode;
+pub mod techdigraph;
 
 
-const TECHLISTSIZE: usize = 18;
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Tech {
+  Antimatter,
+  Earthquake,
+  EnergyShield,
+  Flight,
+  Teleport,
+  Walls,
+  WarningSystem,
+  WeatherControl,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8,
+  T9,
+  T10,
+}
 
+impl From<Tech> for String {
+  fn from(t: Tech) -> String {
+    match t {
+      Tech::Antimatter     => "Antimatter".to_string(),
+      Tech::Earthquake     => "Earthquake".to_string(),
+      Tech::EnergyShield   => "EnergyShield".to_string(),
+      Tech::Flight         => "Flight".to_string(),
+      Tech::Teleport       => "Teleport".to_string(),
+      Tech::Walls          => "Walls".to_string(),
+      Tech::WarningSystem  => "WarningSystem".to_string(),
+      Tech::WeatherControl => "WeatherControl".to_string(),
+      Tech::T1             => "T1".to_string(),
+      Tech::T2             => "T2".to_string(),
+      Tech::T3             => "T3".to_string(),
+      Tech::T4             => "T4".to_string(),
+      Tech::T5             => "T5".to_string(),
+      Tech::T6             => "T6".to_string(),
+      Tech::T7             => "T7".to_string(),
+      Tech::T8             => "T8".to_string(),
+      Tech::T9             => "T9".to_string(),
+      Tech::T10            => "T10".to_string(),
+    }
+  }
+}
 
+/*
 pub struct TechDiGraph {
   tech_list: Vec<Option<TechNode> >,
 }
@@ -180,6 +222,7 @@ impl TechDiGraph {
     })
   }
 }
+*/
 
 #[cfg(test)]
 mod tests;

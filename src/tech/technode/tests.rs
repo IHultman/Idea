@@ -1,4 +1,3 @@
-use tech::crystalprop::*;
 use super::*;
 
 #[test]

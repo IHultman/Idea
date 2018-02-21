@@ -14,7 +14,7 @@ const PRODUCT: f64 = 25.0;
 type Ptr<T> = Arc<Mutex<T> >;
 
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Color {
   Blue,
   Energy,
