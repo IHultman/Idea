@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
 use facility::Facility;
 use facility::location::Loc;
-
 use worker::Worker;
 
 

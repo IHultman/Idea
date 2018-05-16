@@ -18,87 +18,85 @@ fn skill_level_test() {
 }
 
 #[test]
-fn worker_energy_test() {
+fn worker_test_1() {
   let mut worker = Worker::new(0);
 
+  assert_eq!(worker.get_id(), 0);
   assert_eq!(worker.get_energy(), 1.0);
-
-  worker.add_energy(0.5);
-  assert_eq!(worker.get_energy(), 1.0);
-
-  worker.remove_energy(0.5);
-  assert_eq!(worker.get_energy(), 0.5);
-
-  worker.remove_energy(0.5);
-  assert_eq!(worker.get_energy(), 0.1);
-}
-
-#[test]
-fn worker_loc_test() {
-  let mut worker = Worker::new(0);
-
-  assert_eq!(worker.get_loc(), None);
-
-  worker.set_loc(Loc::Academy);
-  assert_eq!(worker.get_loc(), Some(Loc::Academy) );
+  assert!(worker.get_loc().is_none() );
+  assert_eq!(worker.get_skill_lvl(Loc::Farm), 1);
 
   worker.set_loc(Loc::Farm);
+
   assert_eq!(worker.get_loc(), Some(Loc::Farm) );
 
-  worker.set_loc(Loc::Lab);
-  assert_eq!(worker.get_loc(), Some(Loc::Lab) );
-
-  worker.set_loc(Loc::Mine);
-  assert_eq!(worker.get_loc(), Some(Loc::Mine) );
-
-  worker.set_loc(Loc::Ship);
-  assert_eq!(worker.get_loc(), Some(Loc::Ship) );
-
-  worker.set_loc(Loc::WaterProcessor);
-  assert_eq!(worker.get_loc(), Some(Loc::WaterProcessor) );
-}
-
-#[test]
-#[should_panic(expected = "Cannot add experience without location")]
-fn worker_skills_test_1() {
-  let mut worker = Worker::new(0);
-
-  worker.add_exp(50);
-}
-
-#[test]
-fn worker_skills_test_2() {
-  let mut worker = Worker::new(0);
-
-  assert_eq!(worker.get_skill_lvl(Loc::Academy), 1);
-  assert_eq!(worker.get_skill_lvl(Loc::Farm), 1);
-  assert_eq!(worker.get_skill_lvl(Loc::Lab), 1);
-  assert_eq!(worker.get_skill_lvl(Loc::Mine), 1);
-  assert_eq!(worker.get_skill_lvl(Loc::Ship), 1);
-  assert_eq!(worker.get_skill_lvl(Loc::WaterProcessor), 1);
-
-  worker.set_loc(Loc::Academy);
-  worker.add_exp(50);
-
-  worker.set_loc(Loc::Farm);
-  worker.add_exp(2000);
-
-  worker.set_loc(Loc::Lab);
   worker.add_exp(100);
 
-  worker.set_loc(Loc::Mine);
-  worker.add_exp(1500);
+  assert_eq!(worker.get_skill_lvl(Loc::Farm), 3);
 
-  worker.set_loc(Loc::Ship);
-  worker.add_exp(350);
+  worker.set_loc(Loc::Mine);
+
+  assert_eq!(worker.get_loc(), Some(Loc::Mine) );
+
+  worker.add_exp(20000);
+
+  assert_eq!(worker.get_skill_lvl(Loc::Mine), 10);
+
+  worker.add_energy(10.0);
+
+  assert_eq!(worker.get_energy(), 1.0);
+
+  worker.remove_energy(10.0);
+
+  assert_eq!(worker.get_energy(), 0.1);
+
+  worker.add_energy(0.4);
+
+  assert_eq!(worker.get_energy(), 0.5);
+}
+
+#[test]
+#[should_panic]
+fn worker_test_2() {
+  let mut worker = Worker::new(1);
+
+  worker.add_exp(1);
+}
+
+#[test]
+#[should_panic]
+fn worker_test_3() {
+  let mut worker = Worker::new(2);
+
+  worker.set_loc(Loc::Lab);
+  worker.add_energy(-1.0);
+}
+
+#[test]
+#[should_panic]
+fn worker_test_4() {
+  let mut worker = Worker::new(3);
+
+  worker.set_loc(Loc::Lab);
+  worker.remove_energy(-1.0);
+}
+
+#[test]
+fn worker_test_5() {
+  let mut worker = Worker::new(57);
 
   worker.set_loc(Loc::WaterProcessor);
-  worker.add_exp(500);
+  worker.add_exp(65536);
 
-  assert_eq!(worker.get_skill_lvl(Loc::Academy), 2);
-  assert_eq!(worker.get_skill_lvl(Loc::Farm), 10);
-  assert_eq!(worker.get_skill_lvl(Loc::Lab), 3);
-  assert_eq!(worker.get_skill_lvl(Loc::Mine), 9);
-  assert_eq!(worker.get_skill_lvl(Loc::Ship), 5);
-  assert_eq!(worker.get_skill_lvl(Loc::WaterProcessor), 6);
+  assert_eq!(worker.get_skill_lvl(Loc::WaterProcessor), 1);
+}
+
+#[test]
+fn worker_test_6() {
+  let mut worker = Worker::new(57);
+
+  worker.set_loc(Loc::WaterProcessor);
+  worker.add_exp(65535);
+
+  assert_eq!(worker.get_skill_lvl(Loc::WaterProcessor), 10);
 }

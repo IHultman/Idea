@@ -4,11 +4,8 @@ use std::fmt::Debug;
 use std::ops::{Add, Mul, Sub};
 use std::sync::{Arc, Mutex};
 use std::thread;
-
 use facility::location::Loc;
-
 use resources::ResourceAccum;
-
 use worker::Worker;
 
 
@@ -51,7 +48,7 @@ pub trait Facility where
   fn remove_unit(&mut self, id: u8) -> Option<Ptr<Worker> > {
     self.borrow_crew_hash_mut().remove(&id)
   }
-
+/*
   fn exp_up(&mut self) {
     let mut handles = self.borrow_crew_hash()
                           .iter()
@@ -63,6 +60,12 @@ pub trait Facility where
 
     for handle in handles {
       handle.join();
+    }
+  }
+*/
+  fn exp_up(&mut self) {
+    for (_, worker) in self.borrow_crew_hash().iter() {
+      worker.lock().unwrap().add_exp(EXP);
     }
   }
 }

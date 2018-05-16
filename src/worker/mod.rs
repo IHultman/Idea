@@ -77,11 +77,13 @@ impl Worker {
   }
 
   pub fn add_energy(&mut self, energy: f64) {
+    assert!(energy > 0.0);
     let new_energy_level = self.energy + energy;
     self.energy = if new_energy_level > 1.0 {1.0} else {new_energy_level};
   }
 
   pub fn remove_energy(&mut self, energy: f64) {
+    assert!(energy > 0.0);
     let new_energy_level = self.energy - energy;
     self.energy = if new_energy_level < 0.10 {0.10} else {new_energy_level};
   }

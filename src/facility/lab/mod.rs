@@ -1,11 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
 use facility::{Facility, ResourceAccum};
 use facility::location::Loc;
-
 use resources::crystals::{Color, CrystalBatch};
-
 use worker::Worker;
 
 

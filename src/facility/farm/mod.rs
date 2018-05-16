@@ -1,11 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
 use facility::{Facility, Producer};
 use facility::location::Loc;
-
 use resources::food::Food;
-
 use worker::Worker;
 
 

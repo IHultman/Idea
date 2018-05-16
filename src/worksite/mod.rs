@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
-
 use facility::{Facility, Producer};
 use facility::academy::Academy;
 use facility::farm::Farm;
@@ -10,13 +9,12 @@ use facility::location::Loc;
 use facility::mine::Mine;
 use facility::ship::Ship;
 use facility::waterproc::WaterProcessor;
-
 use resources::{ResourceAccum, ResourceUpkeep};
 use resources::crystals::CrystalBatch;
 use resources::food::Food;
 use resources::water::Water;
-
 use worker::Worker;
+
 
 type Ptr<T> = Arc<Mutex<T> >;
 
